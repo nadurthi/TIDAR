@@ -8,8 +8,32 @@ Created on Mon Aug  1 14:58:44 2022
 
 import open3d as o3d
 import os
+import numpy as np
+import cv2
+from PIL import Image
 
-pcd = o3d.io.read_point_cloud(os.path.join("sampleset1","velodyne","velodyne_10.pcd") )
+ffpng=os.path.join('/home/nvidiaorin/Documents/TIDAR/shipTracking','simulations','sampleset1','left','image_1.png')
+ffpcd=os.path.join('/home/nvidiaorin/Documents/TIDAR/shipTracking','simulations','sampleset1','pointcloud','image_1.npz.npy')
+ffjpg=os.path.join('/home/nvidiaorin/Documents/TIDAR/shipTracking','simulations','ff.jpg')
+
+Limg = cv2.imread(ffpng, cv2.IMREAD_COLOR)
+X = np.load(ffpcd)
+PP=np.ravel(X[:, :, 3]).view('uint8').reshape((X.shape[0],X.shape[1], 4))
+
+cv2.imshow("Left",Limg)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+ 
+#.astype(np.float32)/255.0
+
+#pcd = o3d.io.read_point_cloud(ff )
+#X=np.asarray(pcd.points)
+pcd = o3d.geometry.PointCloud()
+XX=X[:,:,:3].reshape(-1,3)/1000
+ind=np.isfinite(XX[:,0])
+pcd.points = o3d.utility.Vector3dVector(XX[ind])
+cc=PP[:,:,:3].reshape(-1,3)[ind]
+pcd.colors = o3d.utility.Vector3dVector(cc/255.0) #
 o3d.visualization.draw_geometries([pcd])
 
 

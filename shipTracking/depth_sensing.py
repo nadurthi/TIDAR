@@ -31,8 +31,20 @@ import time
 import os
 import pickle as pkl
 import cv2 
+import open3d as o3d
 
-folder = 'sampleset1'
+def cv2pcd_to_o3dpcd(X):
+    PP=np.ravel(X[:, :, 3]).view('uint8').reshape((X.shape[0],X.shape[1], 4))
+    pcd = o3d.geometry.PointCloud()
+    XX=X[:,:,:3].reshape(-1,3)/1000
+    ind=np.isfinite(XX[:,0])
+    pcd.points = o3d.utility.Vector3dVector(XX[ind])
+    cc=PP[:,:,:3].reshape(-1,3)[ind]
+    pcd.colors = o3d.utility.Vector3dVector(cc/255.0) #
+#    o3d.visualization.draw_geometries([pcd])
+    return pcd
+
+folder = 'simulations/sampleset1'
 
 if __name__ == "__main__":
     print("Running Depth Sensing sample ... Press 'Esc' to quit")
@@ -49,7 +61,7 @@ if __name__ == "__main__":
 
     init.depth_minimum_distance = 100  # Set the depth mode to ULTRA
     init.depth_maximum_distance = 5000
-    init.camera_fps = 10 
+    init.camera_fps = 20 
 
     zed = sl.Camera()
     status = zed.open(init)
@@ -92,9 +104,9 @@ if __name__ == "__main__":
 #        depth_map = sl.Mat(width, height, sl.MAT_TYPE.F32_C1)
         point_cloud = sl.Mat(width, height, sl.MAT_TYPE.F32_C4, sl.MEM.CPU)   
         if zed.grab(runtime) == sl.ERROR_CODE.SUCCESS:
-#            zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA,sl.MEM.CPU)
+            zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA,sl.MEM.CPU)
             zed.retrieve_image(Limage, sl.VIEW.LEFT) # Retrieve left image
-#            zed.retrieve_image(Rimage, sl.VIEW.RIGHT) # Retrieve left image
+            zed.retrieve_image(Rimage, sl.VIEW.RIGHT) # Retrieve left image
 #            zed.retrieve_measure(depth_map, sl.MEASURE.DEPTH) # Retrieve depth
 
 #            L.append([Limage,depth_map,point_cloud])
@@ -112,8 +124,7 @@ if __name__ == "__main__":
 #            print(x,y,z,color)
 #            viewer.updateData(point_cloud)
             
-            point_cloud.write(os.path.join(folder,"pointcloud","image_%d.pcd"%cnt))
-            Limage.write(os.path.join(folder,"left","image_%d.png"%cnt))
+            
             # saving data
 #            if Limage.write(os.path.join(folder,"left","image_%d.png"%cnt))!= sl.ERROR_CODE.SUCCESS:
 #                break
@@ -122,15 +133,59 @@ if __name__ == "__main__":
 #            if depth_map.write(os.path.join(folder,"depth","depth_%d.png"%cnt))!= sl.ERROR_CODE.SUCCESS:
 #                break
             
-            cnt+=1
+#            image_ocv = Limage.get_data()
+            # Display the left image from the numpy array
+#            cv2.imshow("Image", image_ocv)
+#            key = cv2.waitKey(0)
+            
+#            if key == 27 or key == 113:
+#                break
+            
+            if 1: #key == 115:
+#                point_cloud.write(os.path.join(folder,"pointcloud","image_%d.pcd"%cnt))
+                Limage.write(os.path.join(folder,"left","image_%d.png"%cnt))
+                Rimage.write(os.path.join(folder,"right","image_%d.png"%cnt))
+                
+#                PP=np.ravel(point_cloud.get_data()[:, :, 3]).view('uint8').reshape((height,width, 4))
+                cvpcd=point_cloud.get_data()
+                np.save(os.path.join(folder,"pointcloud","image_%d"%cnt),cvpcd)
+                
+#                X= np.zeros((width*height,3))
+#                Xc= np.zeros((width*height,3))
+#                k=0
+#                for i in range(width):
+#                    for j in range(height):
+#                        err,point3D = point_cloud.get_value(i,j)
+#                        X[k,0]=point3D[0]
+#                        X[k,1]=point3D[1]
+#                        X[k,2]=point3D[2]
+#                        
+#                        Xc[k,0]=image_ocv[i,j,0]
+#                        Xc[k,1]=image_ocv[i,j,1]
+#                        Xc[k,2]=image_ocv[j,i,2]
+#                        
+#                        
+#                        k+=1
+#                
+#                break
+#                                        
+#                pcd = o3d.geometry.PointCloud()
+#                X[:,:3]=X[:,:3]/1000
+#                pcd.points = o3d.utility.Vector3dVector(X)
+#                pcd.colors = o3d.utility.Vector3dVector(Xc)
+#                o3d.io.write_point_cloud(os.path.join(folder,"pointcloud","image_%d.pcd"%cnt), pcd)
+                
+                cnt+=1
+                
+                print(cnt)
+                
             time.sleep(0.1)
-            print(cnt)
-            if cnt==200:
+            if cnt==300:
                 break
 
 #    viewer.exit()
     zed.close()
-
+    cv2.destroyAllWindows()
 #for cnt,m in enumerate(L):
 #    Limage,Rimage,depth_map = m
 #    Limage.write(os.path.join(folder,"left","image_%d.png"%cnt))

@@ -11,12 +11,20 @@ from rclpy.node import Node
 import ros2_numpy as rnp
 import open3d as o3d
 import os
+import threading
 
 from std_msgs.msg import String
 from sensor_msgs.msg import LaserScan,PointCloud2
 
 folder = 'sampleset1'
 os.makedirs(os.path.join(folder,"velodyne"),exist_ok=True)
+
+def savePCD(X,cnt):
+    pcd = o3d.geometry.PointCloud()
+    pcd.points = o3d.utility.Vector3dVector(X[:,:3])   
+#        pcd.colors = o3d.utility.Vector3dVector(X[:,3]) 
+    o3d.io.write_point_cloud(os.path.join(folder,"velodyne","velodyne_%d.pcd"%cnt), pcd)
+    
 
 class VeloSubscriber(Node):
 
@@ -32,11 +40,12 @@ class VeloSubscriber(Node):
         self.cnt=0
         
     def listener_callback(self, msg):
+        
         X = rnp.point_cloud2.pointcloud2_to_xyz_array(msg, remove_nans=True)
-        pcd = o3d.geometry.PointCloud()
-        pcd.points = o3d.utility.Vector3dVector(X[:,:3])   
-#        pcd.colors = o3d.utility.Vector3dVector(X[:,3]) 
-        o3d.io.write_point_cloud(os.path.join(folder,"velodyne","velodyne_%d.pcd"%self.cnt), pcd)
+        thrd = threading.Thread(target=savePCD, args=(X,self.cnt))
+        thrd.daemon=True
+        thrd.start()
+        
         self.cnt+=1
         print(X.shape)
         

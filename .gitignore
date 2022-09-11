@@ -2,6 +2,15 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.zip
+*.tar
+*.7z
+*.pyc
+*.tar.gz
+*~
+*.user
+doc
+TAGS
 
 # C extensions
 *.so
@@ -11,6 +20,11 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+log/
+sampleset1/
+sampleset/
+sampleset2/
+install/
 downloads/
 eggs/
 .eggs/

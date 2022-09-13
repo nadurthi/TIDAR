@@ -29,6 +29,7 @@ sampleset2/
 simulations/
 install/
 downloads/
+calibration_images/
 eggs/
 .eggs/
 lib/

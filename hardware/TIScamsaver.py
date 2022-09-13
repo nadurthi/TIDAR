@@ -1,7 +1,7 @@
 import sys
 import cv2
 import numpy as np
-
+import os
 import json
 import time
 import TIS
@@ -11,6 +11,10 @@ import TIS
 # pyhton-opencv
 # pyhton-gst-1.0
 # tiscamera
+
+folder = "calibration_images"
+os.makedirs(folder,exist_ok=True)
+
 with open("cameras.json") as jsonFile:
     cameraconfigs = json.load(jsonFile)
     jsonFile.close()
@@ -62,7 +66,8 @@ cv2.namedWindow('Window', cv2.WINDOW_NORMAL)  # Create an OpenCV output window
 
 kernel = np.ones((5, 5), np.uint8)  # Create a Kernel for OpenCV erode function
 
-
+savecalib=True
+cnt=0
 while lastkey != 27:
     tries=0
     while(1):
@@ -90,8 +95,12 @@ while lastkey != 27:
 #        image1 = TisCams[1].Get_image()
         #image = cv2.erode(image, kernel, iterations=5)  # Example OpenCV image processing
         print(images[0].shape,images[1].shape)
-        cv2.imshow('Window', np.hstack(images))  # Display the result
-
+        comb_img = np.hstack(images)
+        cv2.imshow('Window', comb_img)  # Display the result
+        
+        if savecalib:
+            cv2.imwrite(os.path.join(folder,'image_%d.png'%cnt), comb_img)
+            cnt+=1
     lastkey = cv2.waitKey(10)
 
 # Stop the pipeline and clean up

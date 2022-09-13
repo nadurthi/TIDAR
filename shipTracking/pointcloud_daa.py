@@ -67,3 +67,14 @@ o3d.visualization.draw_geometries([pcd])
 #downpcd.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(
 #        radius=0.1, max_nn=30))
 #o3d.visualization.draw_geometries([downpcd])
+
+
+import open3d as o3d
+
+mesh = o3d.io.read_triangle_mesh("/home/na0043/Insync/n.adurthi@gmail.com/Google Drive/repos/TIDAR/shipTracking/data_0.ply")
+o3d.visualization.draw_geometries([mesh])
+
+pcd = o3d.geometry.PointCloud()
+pcd.points = mesh.vertices
+pcd.colors = mesh.vertex_colors
+o3d.visualization.draw_geometries([pcd])

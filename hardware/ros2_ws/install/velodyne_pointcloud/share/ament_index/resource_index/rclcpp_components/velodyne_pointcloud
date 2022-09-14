@@ -1,0 +1,2 @@
+velodyne_pointcloud::Convert;lib/libconvert.so
+velodyne_pointcloud::Transform;lib/libtransform.so

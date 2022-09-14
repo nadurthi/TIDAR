@@ -39,7 +39,9 @@ points = rs.points()
 
 path = '/media/na0043/misc/DATA/ship/color_image_bgra_files'
 
-os.makedirs(os.path.join(path,'rgbd'),exist_ok=True)
+os.makedirs(os.path.join(path,'rgbd','data'),exist_ok=True)
+os.makedirs(os.path.join(path,'rgbd','depth'),exist_ok=True)
+os.makedirs(os.path.join(path,'rgbd','color'),exist_ok=True)
 os.makedirs(os.path.join(path,'ply'),exist_ok=True)
 cnt=0
 try:
@@ -93,27 +95,14 @@ try:
         # Render image in opencv window
         cv2.imshow("Depth Stream", depth_color_image)
         cv2.imshow("Color Stream", color_image_bgra)
-        np.savez(os.path.join(path,'rgbd','data_%d'%cnt),depth=depth_image,color=color_image)
 
-        # Create save_to_ply object
-        # ply = rs.save_to_ply(os.path.join(path,'ply','data_%d.ply'%cnt))
-        #
-        # # Set options to the desired values
-        # # In this example we'll generate a textual PLY with normals (mesh is already created by default)
-        # ply.set_option(rs.save_to_ply.option_ply_binary, True)
-        # ply.set_option(rs.save_to_ply.option_ply_normals, False)
+        np.savez(os.path.join(path,'rgbd','data','data_%d'%cnt),depth=depth_image,color=color_image)
+        cv2.imwrite(os.path.join(path,'rgbd','color','%07d.jpg'%cnt),color_image_bgra)
+        cv2.imwrite(os.path.join(path, 'rgbd', 'depth', '%07d.jpg' % cnt),depth_image)
 
-
-        # Apply the processing block to the frameset which contains the depth frame and the texture
-        # ply.process(colorized)
-
-
-        pc.map_to(color_frame)
-        points = pc.calculate(depth_frame)
-
-        # points = pc.calculate(depth_frame)
         # pc.map_to(color_frame)
-        points.export_to_ply(os.path.join(path,'ply','data_%d.ply'%cnt), color_frame)
+        # points = pc.calculate(depth_frame)
+        # points.export_to_ply(os.path.join(path,'ply','data_%d.ply'%cnt), color_frame)
 
         cnt+=1
 
@@ -122,6 +111,9 @@ try:
         if key == 27:
             cv2.destroyAllWindows()
             break
+        if cnt ==10000:
+            break
+
 
 finally:
     pass

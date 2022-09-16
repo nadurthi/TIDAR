@@ -22,8 +22,11 @@ os.makedirs(os.path.join(path,'registered_fragments'),exist_ok=True)
 # os.makedirs(os.path.join(path,'ply'),exist_ok=True)
 
 def load_ply_file(i,voxel_size=0.0):
-    pcd = o3d.io.read_point_cloud(os.path.join(path,'velodyne','velodyne_%d.pcd'%i))
-
+    X=np.load(os.path.join(path,'velodyne','velodyne_%d.npy'%i))
+#    pcd = o3d.io.read_point_cloud(os.path.join(path,'velodyne','velodyne_%d.pcd'%i))
+    pcd = o3d.geometry.PointCloud()
+    pcd.points = o3d.utility.Vector3dVector(X[:,:3])  
+    
     radius_normal = voxel_size * 5
     print(":: Estimate normal with search radius %.3f." % radius_normal)
     pcd.estimate_normals(
@@ -105,7 +108,7 @@ def full_registration(n0_pcd,nf_pcd, max_correspondence_distance_coarse,
     D={}
     for source_id in range(n0_pcd,nf_pcd):
         s_pcd=load_ply_file(source_id,voxel_size=voxel_size)
-        out = Parallel(n_jobs=5, prefer="threads")(delayed(intermediate)(s_pcd,target_id) for target_id in range(n0_pcd,nf_pcd))
+        out = Parallel(n_jobs=5, prefer="threads")(delayed(intermediate)(s_pcd,target_id) for target_id in range(max(n0_pcd,source_id-5),min(source_id+5,nf_pcd)))
         if source_id not in G.nodes:
             G.add_node(source_id)
 
@@ -154,8 +157,8 @@ if __name__=="__main__":
     voxel_size_fine=0.01
     
     voxel_size = 0.01
-    max_correspondence_distance_coarse = 0.7
-    max_correspondence_distance_fine = 0.1
+    max_correspondence_distance_coarse = 1
+    max_correspondence_distance_fine = 0.6
     n0_pcd = args.n0
     nf_pcd = args.nf
 
@@ -222,3 +225,30 @@ if __name__=="__main__":
     pngcomb_file = os.path.join(path, 'registered_fragments', "PCDShipImage_%d_%d.png" % (n0_pcd, nf_pcd))
     vis.capture_screen_image(pngcomb_file)
     vis.destroy_window()
+    
+    
+    r=0.089
+    thy=
+    pcd1=load_ply_file(400,voxel_size=0.01)
+    n1=np.asarray(pcd1.points).shape
+    pcd1.paint_uniform_color([1,0,0])
+    
+    pcd2=load_ply_file(501,voxel_size=0.01)
+    n2=np.asarray(pcd1.points).shape
+    pcd2.paint_uniform_color([0,1,0])
+    
+    o3d.visualization.draw_geometries([pcd1,pcd2])
+    
+    icp_fine = o3d.pipelines.registration.registration_generalized_icp(
+        pcd2, pcd1, 0.1,
+        np.identity(4),
+        o3d.pipelines.registration.
+        TransformationEstimationForGeneralizedICP(),
+        o3d.pipelines.registration.ICPConvergenceCriteria(
+            relative_fitness=1e-6,
+            relative_rmse=1e-6,
+            max_iteration=170))
+    
+    pcd3=pcd2.transform(icp_fine.transformation)
+    
+    o3d.visualization.draw_geometries([pcd1,pcd3])

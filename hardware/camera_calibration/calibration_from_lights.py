@@ -67,7 +67,7 @@ for label in np.unique(labels):
 		mask = cv2.add(mask, labelMask)
         
         
-        
+    
 #%% no compute the centroid of the blobs
         
         

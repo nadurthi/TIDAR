@@ -27,12 +27,11 @@ sampleset1/
 sampleset/
 sampleset2/
 simulations/
-install/
 downloads/
 calibration_images/
 eggs/
 .eggs/
-lib/
+
 lib64/
 parts/
 sdist/

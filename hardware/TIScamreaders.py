@@ -6,6 +6,9 @@ import json
 import time
 import TIS
 
+
+
+showBlurryMeasure=True
 # This sample shows, how to get an image and convert it to OpenCV
 # needed packages:
 # pyhton-opencv
@@ -90,6 +93,14 @@ while lastkey != 27:
 #        image1 = TisCams[1].Get_image()
         #image = cv2.erode(image, kernel, iterations=5)  # Example OpenCV image processing
         print(images[0].shape,images[1].shape)
+        h,  w = images[0].shape[:2]
+        
+        if showBlurryMeasure:
+            for i in range(len(TisCams)):
+                fm=cv.Laplacian(images[i], cv.CV_64F).var()
+            	cv.putText(images[i], "blurry: {:.2f}".format(fm), ( int(w/2),int(h/2) ),
+            	cv.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 5)
+
         cv2.imshow('Window', np.hstack(images))  # Display the result
 
     lastkey = cv2.waitKey(10)

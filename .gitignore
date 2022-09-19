@@ -6,6 +6,7 @@ __pycache__/
 *.tar
 *.7z
 *.pyc
+calibration_images/
 *.tar.gz
 *~
 *.pcd

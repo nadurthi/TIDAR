@@ -210,8 +210,9 @@ if __name__ == "__main__":
 
     os.makedirs(params['fragmentsNextfolder'], exist_ok=True)
 
-    n0_pcd = 0
+    n0_pcd = 50
     nf_pcd = len([f for f in os.listdir(params['fragmentfolder']) if '.pcd' in f])
+    nf_pcd = 60
 
     # ---- seq registration
     with o3d.utility.VerbosityContextManager(o3d.utility.VerbosityLevel.Debug) as cm:

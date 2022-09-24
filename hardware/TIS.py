@@ -7,6 +7,7 @@ import numpy
 from enum import Enum
 gi.require_version("Gst", "1.0")
 gi.require_version("Tcam", "1.0")
+import json
 
 from gi.repository import GLib, GObject, Gst, Tcam
 
@@ -519,3 +520,72 @@ class FmtDesc:
                                                                          resolution.split('x')[0],
                                                                          resolution.split('x')[1],
                                                                          fps)
+
+
+
+class MultiTis:
+    def __init__(self,configfile):
+        with open(configfile) as jsonFile:
+            self.cameraconfigs = json.load(jsonFile)
+            jsonFile.close()
+        self.TisCams = []
+        
+    def stop_cameras(self):
+        for i in range(len(self.TisCams)):
+            self.TisCams[i].Stop_pipeline()
+    
+    def start_cameras(self):
+
+        for cameraconfig in self.cameraconfigs['cameras']:
+            camera = TIS.TIS()
+            
+            camera.openDevice(cameraconfig['serial'],
+                              cameraconfig['width'],
+                              cameraconfig['height'],
+                              cameraconfig['framerate'],
+                              TIS.SinkFormats.fromString(cameraconfig['pixelformat']),
+                              False)
+        
+            self.TisCams.append(camera)
+    
+        for i in range(len(self.TisCams)):
+            properties = self.cameraconfigs['cameras'][i]['properties']
+            try:
+                self.TisCams[i].Set_Property(properties['property'],properties['value'])
+            except Exception as error:
+                print(error)
+            
+            self.TisCams[i].Set_Property("TriggerMode","Off")
+        
+        for i in range(len(self.TisCams)):
+            self.TisCams[i].Start_pipeline() 
+    
+    def __len__(self):
+        return len(self.TisCams)
+    
+    def snapImages(self):
+        tries=0
+        images=None
+        while(1):
+            flg = True
+            for i in range(len(self.TisCams)):
+                flg = flg and (self.TisCams[i].sample is not None and self.TisCams[i].newsample)
+    #            flg=flg and TisCams[i].Snap_image(1)
+            if flg is True:
+                for i in range(len(self.TisCams)):
+                    self.TisCams[i].brute_force_convert_numpy()
+                
+                images=[]
+                for i in range(len(self.TisCams)):
+                    images.append(self.TisCams[i].Get_image())  # Get the image. It is a numpy array
+            
+                break
+            time.sleep(0.01)
+            tries+=1
+            if tries > 100:
+                for i in range(len(self.TisCams)):
+                    self.TisCams[i].Stop_pipeline()
+                raise Exception("Failed to read cams after tries = ", tries)
+            
+        return images
+    

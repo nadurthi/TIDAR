@@ -23,6 +23,10 @@ TAGS
 # Distribution / packaging
 .Python
 build/
+bestmodels/
+mboutput/
+checkpoint/
+checkpoints/
 develop-eggs/
 dist/
 log/

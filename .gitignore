@@ -7,6 +7,8 @@ __pycache__/
 *.7z
 *.pyc
 calibration_images/
+camera_saved_data/
+camera_calibration_data/
 *.tar.gz
 *~
 *.pcd

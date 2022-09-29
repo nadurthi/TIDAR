@@ -6,8 +6,13 @@ Created on Sat Sep 24 20:09:26 2022
 @author: nvidiaorin
 """
 import configparser
+import stereocodes.SGMpython.gpu_library  as gpu_library
+
 config = configparser.ConfigParser()
 
-
-with open('multicam_config.ini', 'w') as configfile:
-    config.read(configfile)
+config.read_file(open('multicam_config.ini'))
+config_dict={}
+for k in config.keys():
+    config_dict[k]=dict(config[k])
+    
+gpu_library.Algo_libsgm()

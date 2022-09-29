@@ -16,36 +16,13 @@
 // #include <Eigen/Geometry>
 
 
-#include <stdlib.h>
+#include "libsgm_stereo.h"
+#include "opencv_stereo.h"
 #include <iostream>
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <chrono>
-#include <ctime>
 #include <vector>
 #include <string>
-#include <algorithm>
-#include <cmath>
-#include <random>
-#include <utility>
-#include <thread>
-#include <map>
-#include <unordered_map>
-#include <queue>
-#include <array>
-#include <iomanip>
-#include <memory>
-#include <opencv2/core/cuda.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <boost/range/iterator_range.hpp>
-#include <boost/filesystem.hpp>
-using namespace boost::filesystem;
 using json = nlohmann::json;
 
-#include <libsgm.h>
 
 
 template <typename T>
@@ -119,67 +96,7 @@ void map_array(pybind11::array_t<T> vec, T scalar)
   }
 }
 
-class Algo_libsgm{
-public:
-Algo_libsgm(std::string opt ){
-  auto options=json::parse(opt);
 
-	int disp_size = options["libSGM"]["max_disparity"];
-	// int P1 = options["libSGM"]["P1"]; //7
-	// int P2 = options["libSGM"]["P2"];
- //  float uniqueness = options["libSGM"]["uniqueness"];
-	// int num_paths = options["libSGM"]["num_paths"];
-	// int num_paths = options["libSGM"]["max_disparity"];
-	// int LR_max_diff = options["libSGM"]["LR_max_diff"];
-
-	// const sgm::PathType path_type = num_paths == 8 ? sgm::PathType::SCAN_8PATH : sgm::PathType::SCAN_4PATH;
-	// const int input_depth = 16;
-	// const int output_depth = 16;
-
- //  const int h = options["cameras"]["height"];
- //  const int w = options["cameras"]["width"];
-   
-	// const sgm::StereoSGM::Parameters param(P1, P2, uniqueness, false, path_type, min_disp, LR_max_diff);
-	// sgm::StereoSGM ssgm(w, h, disp_size, input_depth, output_depth, sgm::EXECUTE_INOUT_HOST2HOST, param);
-
-	// sgm::LibSGMWrapper sgmgpu(disp_size,P1,P2,uniqueness,false,path_type,min_disp, LR_max_diff);
-
-}
-Eigen::MatrixXf getDisparity(const Eigen::Ref<const Eigen::MatrixXf> &Xleft,const Eigen::Ref<const Eigen::MatrixXf> &Xright){
-	// Mat left,right;
-	// cv.eigen2cv(Xleft,left);
-	// cv.eigen2cv(Xright,right);
-	// cv::Mat disparity(left.size(), CV_16S);
-	// cv::Mat disparity_gpu;
-
-	// ssgm.execute(left.data, right.data, disparity.data);
-	// cv::Mat mask = disparity == ssgm.get_invalid_disparity();
-	// disparity.setTo(cv::Scalar(0, 0, 0), mask);
-
-	// try {
-	// 		cv::cuda::GpuMat d_left, d_right, d_disparity;
-	// 		d_left.upload(left);
-	// 		d_right.upload(right);
-	// 		sgmgpu.execute(d_left, d_right, d_disparity);
-	// 		d_disparity.download(disparity_gpu);
-	// }
-	// catch (const cv::Exception& e) {
-	// 		std::cerr << e.what() << std::endl;
-	// 		return e.code == cv::Error::GpuNotSupported ? 1 : -1;
-	// }
-	// cv::Mat maskgpu = disparity_gpu == sgmgpu.getInvalidDisparity();
-	// disparity_gpu.setTo(0, maskgpu);
-
-  Eigen::MatrixXf Xdisp;
- //  cv.cv2eigen(disparity_gpu,Xdisp);
-  return Xdisp;
-  
-}
-
-std::unique_ptr<sgm::StereoSGM> ssgm_ptr;
-std::unique_ptr<sgm::LibSGMWrapper> sgmgpu_ptr;
-
-};
 
 void take_json(const json& s) {
     std::cout << "This function took an nlohmann::json instance as argument: " << s << std::endl;
@@ -192,16 +109,60 @@ json return_json() {
     return j;
 }
 
+
 namespace py = pybind11;
+
+py::array_t<uint8_t> flipcvMat(py::array_t<uint8_t>& img)
+{
+    size_t rows = img.shape(0);
+    size_t cols = img.shape(1);
+    auto channels = img.shape(2);
+    std::cout << "rows: " << rows << " cols: " << cols << " channels: " << channels << std::endl;
+    auto type = CV_8UC3;
+
+    cv::Mat cvimg2(rows, cols, type, (unsigned char*)img.data());
+
+    cv::imwrite("/source/test.png", cvimg2); // OK
+
+    cv::Mat cvimg3(rows, cols, type);
+    cv::flip(cvimg2, cvimg3, 0);
+
+    cv::imwrite("/source/testout.png", cvimg3); // OK
+
+    py::array_t<uint8_t> output(
+                                py::buffer_info(
+                                cvimg3.data,
+                                sizeof(uint8_t), //itemsize
+                                py::format_descriptor<uint8_t>::format(),
+                                3, // ndim
+                                std::vector<size_t> {rows, cols , 3}, // shape
+                                std::vector<size_t> { sizeof(uint8_t) * cols * 3, sizeof(uint8_t) * 3, sizeof(uint8_t)} // strides
+    )
+    );
+    return output;
+}
+
+
 PYBIND11_MODULE(gpu_library, m)
 {
   m.def("multiply_with_scalar", map_array<double>);
   
   m.def("take_json", &take_json, "pass py::object to a C++ function that takes an nlohmann::json");
   m.def("return_json", &return_json, "return py::object from a C++ function that returns an nlohmann::json");
+  m.def("flipcvMat", &flipcvMat, "flipcvMat");
+
 
   py::class_<Algo_libsgm>(m, "Algo_libsgm")
-        .def(py::init<const std::string &>());
-        // .def("getDisparity", &Algorithms::getDisparity);
+        .def(py::init<const std::string &>())
+        .def("getDisparity_cpu", &Algo_libsgm::getDisparity_cpu)
+        .def("getDisparity_cuda", &Algo_libsgm::getDisparity_cuda)
+        .def("getDisparity_gpu", &Algo_libsgm::getDisparity_gpu);
+
+    py::class_<Algo_openCV>(m, "Algo_openCV")
+        .def(py::init<const std::string &>())
+        .def("getDisparity_cpu", &Algo_openCV::compute_stereo_bm)
+        .def("getDisparity_gpu", &Algo_openCV::compute_stereo_bp)
+        .def("getDisparity_cpu", &Algo_openCV::compute_stereo_csbp)
+        .def("getDisparity_gpu", &Algo_openCV::compute_stereo_csgm);
         
 }

@@ -21,6 +21,7 @@ if (OpenCV_VERSION VERSION_LESS 3.0)
 	message(FATAL_ERROR "Error: OpenCV version requires at least 3.0")
 endif()
 
+add_subdirectory(pybind11)
 
 include_directories(
     ${PYTHON_INCLUDE_DIRS}
@@ -42,7 +43,7 @@ include_directories(${LIBSGM_INCLUDE_DIRS})
 
 
 cuda_add_library(gpu_library SHARED
-  gpu_library.cu)
+  gpu_library.cu opencv_stereo.cu libsgm_stereo.cu)
 
 target_link_libraries(gpu_library
   ${PYTHON_LIBRARIES}

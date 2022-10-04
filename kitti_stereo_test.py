@@ -53,12 +53,19 @@ img2 = gpu_library.flipcvMat(img)
 
 libsgm = gpu_library.Algo_libsgm(json.dumps(config_dict))
 data=np.load('test22.npz')
-grayL=data['grayL']
-grayR=data['grayR']
+Limg=cv2.imread("stereocodes/SGMpython/1.png")
+Rimg=cv2.imread("stereocodes/SGMpython/2.png")
+grayL = cv2.cvtColor(Limg, cv2.COLOR_BGR2GRAY);
+grayR = cv2.cvtColor(Rimg, cv2.COLOR_BGR2GRAY);
+    
 disp_libsgm=libsgm.getDisparity_gpu(grayL,grayR)
-print(disp_libsgm)
 
 
+libopencv = gpu_library.Algo_openCV(json.dumps(config_dict))
+disp_bm_libopencv=libopencv.compute_stereo_bm(grayL,grayR)
+disp_csgm_libopencv=libopencv.compute_stereo_csgm(grayL,grayR)
+
+print("done")
 #%% load config
 
 
@@ -81,7 +88,7 @@ kittimot[0]
 Limg = cv2.imread(left)
 Rimg = cv2.imread(right)
 minDisparity=0
-stereo_sgm_cuda = cv2.StereoSGBM_create(minDisparity=minDisparity,
+stereo_sgbm_pythoncpu = cv2.StereoSGBM_create(minDisparity=0,
                                             numDisparities=128,
                                             blockSize=3,
                                             disp12MaxDiff=10,
@@ -100,26 +107,43 @@ et=time.time()
 print("libsgm cpu",et-st)
 err_ligsgm_cpu=disp_error(disp_libsgm_cpu,dataL)
 
-
 st=time.time()
 disp_libsgm_gpu=libsgm.getDisparity_gpu(grayL,grayR)
 et=time.time()
 print("libsgm gpu",et-st)
 err_ligsgm_gpu=disp_error(disp_libsgm_gpu,dataL)
 
+libopencv = gpu_library.Algo_openCV(json.dumps(config_dict))
 
 st=time.time()
-disp = stereo_sgm_cuda.compute(Limg,Rimg).astype(np.float32)/16
+disp_bm_libopencv=libopencv.compute_stereo_bm(grayL,grayR)
+et=time.time()
+print("opencv cuda bm",et-st)
+
+st=time.time()
+disp_csgm_libopencv=libopencv.compute_stereo_csgm(grayL,grayR)
+et=time.time()
+print("opencv cuda csgm",et-st)
+disp_csgm_libopencv=disp_csgm_libopencv/16
+disp_csgm_libopencv[disp_csgm_libopencv<=0]=0
+
+
+err_bm_cppopencv=disp_error(disp_bm_libopencv/16,dataL)
+err_csgm_cppopencv=disp_error(disp_csgm_libopencv,dataL)
+
+
+st=time.time()
+disp = stereo_sgbm_pythoncpu.compute(Limg,Rimg).astype(np.float32)/16
 #disp[disp<0]=0
 et = time.time()
-print(et-st)
+print("python cv2 sgbm = ",et-st)
 err=disp_error(disp,dataL)
 
 
 
 
 
-pred_pcd = get_points(disp_libsgm_gpu,calib['Q'])
+pred_pcd = get_points(disp_csgm_libopencv.astype(np.int16),calib['Q'])
 true_pcd = get_points(dataL,calib['Q'])
 evaluation = o3d.pipelines.registration.evaluate_registration(
     pred_pcd, true_pcd, 0.5, np.identity(4))

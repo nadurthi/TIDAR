@@ -18,12 +18,12 @@
         "cdn_dnn": "yes"
     },
     "opencv_stereo": {
-        "P1": 7,
+        "P1": 20,
         "P2": 84,
         "max_disparity": 128,
-        "min_disparity": 10,
-        "uniquenessratio": 5,
-        "blocksize": 3,
+        "min_disparity": 0,
+        "uniquenessRatio": 5,
+        "blockSize": 3,
         "iters": 10,
         "levels": 5,
         "nr_plane": 2

@@ -58,3 +58,9 @@ target_link_libraries(stereo_test
 
 set_target_properties(gpu_library PROPERTIES PREFIX "")
 set_target_properties(stereo_test PROPERTIES PREFIX "")
+
+
+cuda_add_executable(opencvtest  main_opencv_test.cpp)
+target_link_libraries(opencvtest
+  ${PYTHON_LIBRARIES}
+  cudart  sgm ${CUDA_LIBRARIES} ${OpenCV_LIBS} ${Boost_LIBRARIES} ${LIBSGM_LIBRARY} Eigen3::Eigen)

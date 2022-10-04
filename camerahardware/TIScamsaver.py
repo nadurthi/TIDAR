@@ -40,7 +40,11 @@ def imagesaver(q,exitflg):
         q.task_done()
         if q.empty() and exitflg.is_set():
             break
-        
+    if len(X)>0:
+        ff=datetime.now().strftime("%Y-%m-%d-%H-%M-%S")+'.pkl'
+        with open(os.path.join(savefolder,saveset,ff),'wb') as F:
+            pkl.dump(X,F)
+            
 if __name__=="__main__":
     exitflg = threading.Event()
     exitflg.clear()
@@ -54,6 +58,7 @@ if __name__=="__main__":
     mTis = TIS.MultiTis(str(pathfile/pathlib.Path("cameras.json")))
     mTis.start_cameras()
     
+    saveonclick=True
     
     
     while 1:
@@ -62,7 +67,8 @@ if __name__=="__main__":
         if images is None:
             continue
         
-        q.put(images)
+        if saveonclick is False:
+            q.put(images)
         
         print(images[0].shape,images[1].shape)
         h,  w = images[0].shape[:2]
@@ -73,6 +79,9 @@ if __name__=="__main__":
         lastkey = cv2.waitKey(10)
         if lastkey == 27 or lastkey == 113:
             break
+        if saveonclick and lastkey == 115:
+            q.put(images)
+            print("saved: ",datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
     
     exitflg.set()
     x.join()

@@ -3,7 +3,7 @@
 #include <cuda_runtime.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
-#include <pybind11/eigen.h>
+// #include <pybind11/eigen.h>
 #include <pybind11/stl.h>
 #include <pybind11/embed.h>  // py::scoped_interpreter
 
@@ -160,9 +160,9 @@ PYBIND11_MODULE(gpu_library, m)
 
     py::class_<Algo_openCV>(m, "Algo_openCV")
         .def(py::init<const std::string &>())
-        .def("getDisparity_cpu", &Algo_openCV::compute_stereo_bm)
-        .def("getDisparity_gpu", &Algo_openCV::compute_stereo_bp)
-        .def("getDisparity_cpu", &Algo_openCV::compute_stereo_csbp)
-        .def("getDisparity_gpu", &Algo_openCV::compute_stereo_csgm);
+        .def("compute_stereo_bm", &Algo_openCV::compute_stereo_bm)
+        .def("compute_stereo_bp", &Algo_openCV::compute_stereo_bp)
+        .def("compute_stereo_csbp", &Algo_openCV::compute_stereo_csbp)
+        .def("compute_stereo_csgm", &Algo_openCV::compute_stereo_csgm);
         
 }

@@ -13,7 +13,7 @@ import glob
 import time
 import open3d as o3d
 
-folder = 'calibration_images'
+folder = 'camera_calibration_data/calibration_images'
 
 def plotcv(imglist):
     for name,img in imglist:

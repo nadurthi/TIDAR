@@ -9,13 +9,13 @@
 #include <pybind11/stl.h>
 #include <pybind11/embed.h>
 
-#include <pybind11/eigen.h>
+// #include <pybind11/eigen.h>
 #include <pybind11/numpy.h>
 #include <opencv2/core/cuda.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/core/eigen.hpp>
+// #include <opencv2/core/eigen.hpp>
 #include <iostream>
 
 

@@ -4,8 +4,9 @@ import numpy as np
 import scipy.fft
 import json
 import time
-from . import TIS
-
+import TIS
+import pathlib
+pathfile=pathlib.Path(__file__).parent.resolve()
 
 def detect_blur_fft(image, size=60, threshold=10):
     grayL = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -46,7 +47,7 @@ def getblurrymeasures(image):
 lastkey = 0
 cv2.namedWindow('Window', cv2.WINDOW_NORMAL)  # Create an OpenCV output window
 
-mTis = TIS.MultiTis("cameras.json")
+mTis = TIS.MultiTis(str(pathfile/pathlib.Path("cameras.json")))
 mTis.start_cameras()
 
 

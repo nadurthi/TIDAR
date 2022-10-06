@@ -529,7 +529,7 @@ class MultiTis:
             self.cameraconfigs = json.load(jsonFile)
             jsonFile.close()
         
-        self.cameraconfigs = sorted(self.cameraconfigs,key=lambda x: x['cam_pos'])
+        self.cameraconfigs['cameras'] = sorted(self.cameraconfigs['cameras'],key=lambda x: x['cam_pos'])
         self.TisCams = []
         
     def stop_cameras(self):
@@ -539,13 +539,13 @@ class MultiTis:
     def start_cameras(self):
 
         for cameraconfig in self.cameraconfigs['cameras']:
-            camera = TIS.TIS()
+            camera = TIS()
             
             camera.openDevice(cameraconfig['serial'],
                               cameraconfig['width'],
                               cameraconfig['height'],
                               cameraconfig['framerate'],
-                              TIS.SinkFormats.fromString(cameraconfig['pixelformat']),
+                              SinkFormats.fromString(cameraconfig['pixelformat']),
                               False)
         
             self.TisCams.append(camera)

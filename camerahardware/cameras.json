@@ -1,7 +1,7 @@
 {
     "cameras":[
         {
-            "serial": "49124129",
+            "serial": "49124132",
 			"format" : "video/x-raw",
 			"pixelformat" : "rggb",
 			"width" : 3072,
@@ -44,7 +44,7 @@
             "imageprefix" : "right"            
         },        
         {
-            "serial": "49124132",
+            "serial": "49124127",
 			"format" : "video/x-raw",
 			"pixelformat" : "rggb",
 			"width" : 3072,
@@ -87,7 +87,7 @@
             "imageprefix" : "left"            
         },
         {
-            "serial": "49124127",
+            "serial": "49124129",
 			"format" : "video/x-raw",
 			"pixelformat" : "rggb",
 			"width" : 3072,

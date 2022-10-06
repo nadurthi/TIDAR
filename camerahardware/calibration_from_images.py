@@ -8,12 +8,14 @@ Created on Fri Sep  9 12:28:32 2022
 
 import numpy as np
 import cv2 as cv
+import cv2
 import os
 import glob
 import time
 import open3d as o3d
-
-folder = 'camera_calibration_data/calibration_images'
+import matplotlib.pyplot as plt
+import collections as clc
+folder = 'camera_saved_data/2022-10-04-18-36-04'
 
 def plotcv(imglist):
     for name,img in imglist:
@@ -38,88 +40,297 @@ def plotcv(imglist):
 
  
 #%%
-# termination criteria
-criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-# prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
-objp = np.zeros((10*7,3), np.float32)
-objp[:,:2] = np.mgrid[0:7,0:10].T.reshape(-1,2)
-objp = objp*0.24
-# Arrays to store object points and image points from all the images.
-objpoints = [] # 3d point in real world space
-imgpointsL = [] # 2d points in image plane.
-imgpointsR = [] # 2d points in image plane.
-images = glob.glob(folder+'/*.png')
-images=sorted(images)
-for i in range(len(images)):
-    fname=os.path.join(folder,'image_%d.png'%i)
-    
-    print(fname)
-    
-    img = cv.imread(fname)
-    
-    
-    n=img.shape[1]
-    Limg = img[:,:int(n/2),:]
-    Rimg = img[:,int(n/2):,:]
-    h,  w = Limg.shape[:2]
-#    while(1):
-#        cv.namedWindow('img0', cv.WINDOW_NORMAL) 
-#        cv.imshow('img0',img)
-#        k = cv.waitKey(33)
-#        if k==27:    # Esc key to stop
-#            break
-#        elif k==-1:  # normally -1 returned,so don't print it
-#            continue
-#        else:
-#            print(k) # else print its value
-#    cv.destroyAllWindows()
-    
-    grayL = cv.cvtColor(Limg, cv.COLOR_BGR2GRAY)
-    grayR = cv.cvtColor(Rimg, cv.COLOR_BGR2GRAY)
-    # Find the chess board corners
-    retL, cornersL = cv.findChessboardCornersSB(grayL, (7,10), None)
-    retR, cornersR = cv.findChessboardCornersSB(grayR, (7,10), None)
-    
-    fm=cv.Laplacian(Limg, cv.CV_64F).var()
-	cv.putText(Limg, "blurry: {:.2f}".format(fm), ( int(w/2),int(h/2) ),
-	cv.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 5)
-    plotcv(["left_image",Limg])
-    # If found, add object points, image points (after refining them)
-    if retL == True and retR == True:
+def getchessboardpattern(folder):
+    criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+    # prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
+    objp = np.zeros((10*7,3), np.float32)
+    objp[:,:2] = np.mgrid[0:7,0:10].T.reshape(-1,2)
+    objp = objp*0.24
+    # Arrays to store object points and image points from all the images.
+    objpoints = [] # 3d point in real world space
+    imgpointsL = [] # 2d points in image plane.
+    imgpointsR = [] # 2d points in image plane.
+    images = glob.glob(folder+'/*.png')
+    images=sorted(images)
+    for i in range(len(images)):
+        fname=os.path.join(folder,'image_%d.png'%i)
+        
+        print(fname)
+        
+        img = cv.imread(fname)
         
         
-        corners2L = cv.cornerSubPix(grayL,cornersL, (11,11), (-1,-1), criteria)
+        n=img.shape[1]
+        Limg = img[:,:int(n/2),:]
+        Rimg = img[:,int(n/2):,:]
+        h,  w = Limg.shape[:2]
+    #    while(1):
+    #        cv.namedWindow('img0', cv.WINDOW_NORMAL) 
+    #        cv.imshow('img0',img)
+    #        k = cv.waitKey(33)
+    #        if k==27:    # Esc key to stop
+    #            break
+    #        elif k==-1:  # normally -1 returned,so don't print it
+    #            continue
+    #        else:
+    #            print(k) # else print its value
+    #    cv.destroyAllWindows()
+        
+        grayL = cv.cvtColor(Limg, cv.COLOR_BGR2GRAY)
+        grayR = cv.cvtColor(Rimg, cv.COLOR_BGR2GRAY)
+        # Find the chess board corners
+        retL, cornersL = cv.findChessboardCornersSB(grayL, (7,10), None)
+        retR, cornersR = cv.findChessboardCornersSB(grayR, (7,10), None)
+        
+        fm=cv.Laplacian(Limg, cv.CV_64F).var()
+        cv.putText(Limg, "blurry: {:.2f}".format(fm), ( int(w/2),int(h/2) ),cv.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 5)
+        plotcv(["left_image",Limg])
+        # If found, add object points, image points (after refining them)
+        if retL == True and retR == True:
+            
+            
+            corners2L = cv.cornerSubPix(grayL,cornersL, (11,11), (-1,-1), criteria)
+    
+            
+            corners2R = cv.cornerSubPix(grayR,cornersR, (11,11), (-1,-1), criteria)
+            
+            
+            
+            # Draw and display the corners
+    #        cv.namedWindow('Window', cv.WINDOW_NORMAL) 
+            cv.drawChessboardCorners(Limg, (7,10), corners2L, retL)
+            cv.drawChessboardCorners(Rimg, (7,10), corners2R, retR)
+            
+            
+            while(1):
+                cv.namedWindow('img', cv.WINDOW_NORMAL) 
+                cv.imshow('img', np.hstack([Limg,Rimg]))
+                k = cv.waitKey(33)
+                if k==27 or k==113:    # Esc key to stop
+                    break
+                if k==115:
+                    print("saved")
+                    objpoints.append(objp)
+                    imgpointsL.append(corners2L)
+                    imgpointsR.append(corners2R)
+                    break
+                elif k==-1:  # normally -1 returned,so don't print it
+                    continue
+                else:
+                    print(k) # else print its value
+            cv.destroyAllWindows()
+    
+    np.savez(os.path.join(folder,'good_calib_points.npz'),objpoints=objpoints,imgpointsL=imgpointsL,imgpointsR=imgpointsR)    
 
+def removept(X,pt):
+    flg=None
+    for i in range(len(X)):
+        if np.array_equal(X[i],pt):
+            flg=1
+            break
+    if flg is None:
+        return X
+    return np.delete(X,i,axis=0)
+
+def closestpt(X,pt):
+    d=np.linalg.norm(np.array(X)-np.array(pt),axis=1)
+    ind = np.argmin(d)
+    return X[ind]
+
+
+def getcustompattern(folder,Ncam):
+    obj_pts=[[0,0],]
+    ff=os.listdir(folder)
+    Nset = int(len(ff)/Ncam)
+    cv.namedWindow("Image pt confirm", cv.WINDOW_NORMAL) 
+    images_pts=[]    
+    for si in range(Nset):
+        for cj in range(1,2): #Ncam
+            print(si,cj)
+            fname = "%05d_%02d.png"%(si,cj)
+            img = cv2.imread(os.path.join(folder,fname))
+            C=detectcustompattern(img)
+            for i in range(len(C)):
+                cv2.putText(img, '%d'%i, (C[i][0],C[i][1]), cv2.FONT_HERSHEY_SIMPLEX, 
+                               1, (0,0,255), 2, cv2.LINE_AA)
+            
+            cv.imshow("Image pt confirm", img)
+            while(1):
+                k = cv.waitKey(33)
+                if k==27 or k==113:    # Esc key to stop
+                    break
+                if k==115:
+                    images_pts.append([si,cj,C])
+                    print("saved")
+                    break
+    cv.destroyAllWindows()
+    return images_pts
+#i=7
+#j=1
+#fname = "%05d_%02d.png"%(i,j)
+#img = cv2.imread(os.path.join(folder,fname))
+#plotcv([["test",img]])
+def detectcustompattern(img):
+    
+#    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+#    lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+#    hsv[:,:,0]=255
+#    hsv[:,:,1]=255
+#    lab[:,:,1]=lab[:,:,0]
+#    lab[:,:,2]=lab[:,:,0]
+
+    
+#    alpha=0.88
+#    beta=1
+#    new_image = np.clip(alpha*img+beta,0,255).round()
+#    plotcv([["img",img],["new_image",new_image],["hsv",hsv],["lab",lab]])
+    
+    #h, s, v = cv2.split(hsv)
+    #value=200
+    #lim = 255 - value
+    #v[v > lim] = 255
+    #v[v <= lim] += value
+    #
+    #final_hsv = cv2.merge((h, s, v))
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    blurred = cv2.GaussianBlur(gray, (3, 3), 0)
+    
+    thresh = cv2.threshold(blurred, 200, 255, cv2.THRESH_BINARY)[1]
+    
+    thresh = cv2.erode(thresh, None, iterations=2)
+    thresh = cv2.dilate(thresh, None, iterations=4)
+    
+    
+#    plotcv([["test",img],["test2",thresh]])
+    
+    contours,hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    centers=[]
+    if len(contours)>=10:
+        for c in contours:
+           # calculate moments for each contour
+           M = cv2.moments(c)
         
-        corners2R = cv.cornerSubPix(grayR,cornersR, (11,11), (-1,-1), criteria)
-        
-        
-        
-        # Draw and display the corners
-#        cv.namedWindow('Window', cv.WINDOW_NORMAL) 
-        cv.drawChessboardCorners(Limg, (7,10), corners2L, retL)
-        cv.drawChessboardCorners(Rimg, (7,10), corners2R, retR)
-        
-        
-        while(1):
-            cv.namedWindow('img', cv.WINDOW_NORMAL) 
-            cv.imshow('img', np.hstack([Limg,Rimg]))
-            k = cv.waitKey(33)
-            if k==27 or k==113:    # Esc key to stop
-                break
-            if k==115:
-                print("saved")
-                objpoints.append(objp)
-                imgpointsL.append(corners2L)
-                imgpointsR.append(corners2R)
-                break
-            elif k==-1:  # normally -1 returned,so don't print it
+           # calculate x,y coordinate of center
+           cX = int(M["m10"] / M["m00"])
+           cY = int(M["m01"] / M["m00"])
+        #   cv2.circle(img, (cX, cY), 5, (255, 0, 0), -1)
+           centers.append([cX,cY])
+    
+    centers = np.array(centers)
+    
+    # now estimate lines
+#    lines=[]
+#    for i in range(len(centers)):
+#        for j in range(len(centers)):
+#            if i==j:
+#                continue
+#            x1,y1 = centers[i]
+#            x2,y2 = centers[j]
+#            m = (y2-y1)/(x2-x1)
+#            th=np.arctan2(y2-y1,x2-x1)
+#            c = y1-m*x1
+#            lines.append([m,c,th])
+#            
+#    lines = np.array(lines)
+#    hist,bins=np.histogram(lines[:,0],bins=np.sort(np.tan(np.arange(-np.pi,np.pi,5*np.pi/180))),density=True) 
+#    ind=np.argsort(hist)
+#    hist = hist[ind]
+#    bins = bins[ind]
+#    slope_2best = bins[-2:]
+#    
+    thresh=10
+    cnt=0
+    sols=[]
+    DD=[]
+    while cnt<100:
+        ind = np.random.choice(len(centers),2)
+        if ind[0]==ind[1]:
+            continue
+        idx=list(ind)
+        for j in range(len(centers)):
+            if j in ind:
                 continue
-            else:
-                print(k) # else print its value
-        cv.destroyAllWindows()
+            idx2 = idx+[j]
+            idx2 = np.sort(idx2)
+            A=np.vstack([centers[idx2,0],np.ones(len(idx2))]).T
+            B=centers[idx2,1]
+            x,residuals,rnk,s=np.linalg.lstsq(A,B)
+            rr = np.abs(A.dot(x)-B)
+            if np.all(rr<thresh):
+                idx.append(j)
+        if len(idx)>=3:
+            A=np.vstack([centers[idx,0],np.ones(len(idx))]).T
+            B=centers[idx,1]
+            x,residuals,rnk,s=np.linalg.lstsq(A,B)
+            sols.append(x)
+            DD.append(tuple(np.sort(idx)))
+        cnt+=1
+    
+    A=clc.Counter(DD)
+    vv=np.sort(list(A.values()))[::-1]
+    II=[]
+    IIsol=[]
+    for i in range(2):
+        for idxs,v in A.items():
+            if v == vv[i]:
+                II.append(idxs)
+                a=np.vstack([centers[idxs,0],np.ones(len(idxs))]).T
+                b=centers[idxs,1]
+                x,residuals,rnk,s=np.linalg.lstsq(a,b)
+                IIsol.append(x)
+                break
+    
+    IIsol=sorted(IIsol,key=lambda x:x[0])
+    m1,c1 = IIsol[0]
+    m2,c2 = IIsol[1] 
+    x0 =(c2-c1)/ (m1-m2)
+    y0 = m1*x0+c1
+    c0 = closestpt(centers,(x0,y0))
+    C=[]
+    C.append(c0)
+    
+    centers2 = centers.copy()
+    centers2=removept(centers2,c0)
+    cc=c0
+    while 1:
+        if len(centers2)==0:
+            break
+        cc=closestpt(centers2,cc)
+        centers2=removept(centers2,cc)
+        e1 = np.abs(cc[1]-(m1*cc[0]+c1))
+        e2 = np.abs(cc[1]-(m2*cc[0]+c2))
+        if e1<e2 and e1<20:
+            C.append(cc)
+            
+    centers2 = centers.copy()
+    centers2=removept(centers2,c0)
+    cc=c0
+    while 1:
+        if len(centers2)==0:
+            break
+        cc=closestpt(centers2,cc)
+        centers2=removept(centers2,cc)
+        e1 = np.abs(cc[1]-(m1*cc[0]+c1))
+        e2 = np.abs(cc[1]-(m2*cc[0]+c2))
+        if e2<e1 and e2<20:
+            C.append(cc)
+            
+    
+    
+    centers2 = centers.copy()
+    C=np.array(C,dtype=int)
+    for i in range(len(C)):
+        centers2=removept(centers2,C[i])
+            
+    C=np.array(C,dtype=int)
+    C=np.vstack([C,centers2])
+    
+    
+    return C
 
-np.savez(os.path.join(folder,'good_calib_points.npz'),objpoints=objpoints,imgpointsL=imgpointsL,imgpointsR=imgpointsR)    
+#C=detectcustompattern(img)
+#plotcv([["test3",img]])
+images_pts=getcustompattern(folder,3)
 
 #%%
 data=np.load(os.path.join(folder,'good_calib_points.npz'))    

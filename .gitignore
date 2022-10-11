@@ -13,6 +13,7 @@ camera_calibration_data/
 *~
 *.pcd
 *.ply
+*.pkl
 *.user
 doc
 TAGS

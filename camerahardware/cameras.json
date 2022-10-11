@@ -33,13 +33,13 @@
                 {"property":"AutoFunctionsROIWidth", "value":3072},
     
                 
-                {"property":"ExposureAutoHighlightReduction", "value":false},
+                {"property":"ExposureAutoHighlightReduction", "value":true},
                 {"property":"ExposureAutoLowerLimit", "value":60},
                 {"property":"ExposureAutoReference", "value":128} , 
                 {"property":"ExposureAutoUpperLimitAuto", "value":true},
                 {"property":"ExposureTime", "value":3505.0},
-                {"property":"AutoFunctionsROIEnable", "value":true},
-                {"property":"ExposureAutoHighlightReduction", "value":false}
+                {"property":"AutoFunctionsROIEnable", "value":true}
+                
             ],
             "imageprefix" : "right"            
         },        
@@ -76,13 +76,13 @@
                 {"property":"AutoFunctionsROIWidth", "value":3072},
     
                 
-                {"property":"ExposureAutoHighlightReduction", "value":false},
+                {"property":"ExposureAutoHighlightReduction", "value":true},
                 {"property":"ExposureAutoLowerLimit", "value":60},
                 {"property":"ExposureAutoReference", "value":128} , 
                 {"property":"ExposureAutoUpperLimitAuto", "value":true},
                 {"property":"ExposureTime", "value":3505.0},
-                {"property":"AutoFunctionsROIEnable", "value":true},
-                {"property":"ExposureAutoHighlightReduction", "value":false}
+                {"property":"AutoFunctionsROIEnable", "value":true}
+                
             ],
             "imageprefix" : "left"            
         },
@@ -119,13 +119,13 @@
                 {"property":"AutoFunctionsROIWidth", "value":3072},
     
                 
-                {"property":"ExposureAutoHighlightReduction", "value":false},
+                {"property":"ExposureAutoHighlightReduction", "value":true},
                 {"property":"ExposureAutoLowerLimit", "value":60},
                 {"property":"ExposureAutoReference", "value":128} , 
                 {"property":"ExposureAutoUpperLimitAuto", "value":true},
                 {"property":"ExposureTime", "value":3505.0},
-                {"property":"AutoFunctionsROIEnable", "value":true},
-                {"property":"ExposureAutoHighlightReduction", "value":false}
+                {"property":"AutoFunctionsROIEnable", "value":true}
+                
             ],
             "imageprefix" : "left"            
         }

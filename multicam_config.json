@@ -1,8 +1,8 @@
 {
     "DEFAULT": {},
     "cameras": {
-        "height": 376,
-        "width": 1241,
+        "height": 2048,
+        "width": 3072,
         "main_cam": 0,
         "use_cams_0": "yes",
         "use_cams_1": "yes",
@@ -18,10 +18,10 @@
         "cdn_dnn": "yes"
     },
     "opencv_stereo": {
-        "P1": 20,
+        "P1": 7,
         "P2": 84,
         "max_disparity": 128,
-        "min_disparity": 0,
+        "min_disparity": 16,
         "uniquenessRatio": 5,
         "blockSize": 3,
         "iters": 10,
@@ -29,10 +29,10 @@
         "nr_plane": 2
     },
     "libSGM": {
-        "P1": 20,
-        "P2": 84,
-        "max_disparity": 128,
-        "min_disparity": 0,
+        "P1": 3,
+        "P2": 70,
+        "max_disparity": 256,
+        "min_disparity": 16,
         "uniqueness": 0.95,
         "num_paths": 4,
         "LR_max_diff": 2

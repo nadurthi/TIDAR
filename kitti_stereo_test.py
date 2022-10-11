@@ -16,6 +16,7 @@ from dataloader import kittimot_dataset
 import time
 import numpy as np
 import json 
+from stereocodes.high_res_stereo_master import getmodel
 
 import stereocodes.SGMpython.gpu_library  as gpu_library
 
@@ -80,13 +81,25 @@ kittimot = kittimot_dataset.KittiMOT('/run/user/1000/gvfs/sftp:host=192.168.68.7
 
 kittimot[0]
 
+#%% setup deep learning model
 
+(left_img, right_img, dataL,(leftfile,rightfile,calib))=loader_kitti12[1]
+model=getmodel.getevalmodel(max_disp=384)
+
+Limg = cv2.imread(leftfile)
+Rimg = cv2.imread(rightfile)
+Limg2=cv2.cvtColor(Limg, cv2.COLOR_BGR2RGB)
+Rimg2 = cv2.cvtColor(Rimg, cv2.COLOR_BGR2RGB)
+pred_disp = getmodel.runmodel(model,Limg2.astype('float32'),Rimg2.astype('float32'))
+
+err=disp_error(pred_disp,dataL)
+print(np.mean(np.abs(err)))
 #%% OPencv Python based stereo
 
 
-(left_img, right_img, dataL,(left,right,calib))=loader_kitti12[0]
-Limg = cv2.imread(left)
-Rimg = cv2.imread(right)
+# (left_img, right_img, dataL,(left,right,calib))=loader_kitti12[0]
+# Limg = cv2.imread(left)
+# Rimg = cv2.imread(right)
 minDisparity=0
 stereo_sgbm_pythoncpu = cv2.StereoSGBM_create(minDisparity=0,
                                             numDisparities=128,
@@ -130,7 +143,7 @@ disp_csgm_libopencv[disp_csgm_libopencv<=0]=0
 
 err_bm_cppopencv=disp_error(disp_bm_libopencv/16,dataL)
 err_csgm_cppopencv=disp_error(disp_csgm_libopencv,dataL)
-
+np.mean(np.abs(err_csgm_cppopencv))
 
 st=time.time()
 disp = stereo_sgbm_pythoncpu.compute(Limg,Rimg).astype(np.float32)/16
@@ -142,14 +155,14 @@ err=disp_error(disp,dataL)
 
 
 
-
-pred_pcd = get_points(disp_csgm_libopencv.astype(np.int16),calib['Q'])
-true_pcd = get_points(dataL,calib['Q'])
-evaluation = o3d.pipelines.registration.evaluate_registration(
-    pred_pcd, true_pcd, 0.5, np.identity(4))
-
-kdt = cKDTree(np.asarray(true_pcd.points),leafsize=5)
-d,i=kdt.query(np.asarray(pred_pcd.points),k=1,distance_upper_bound=0.5)
+disp_plot = pred_disp
+pred_pcd = get_points(disp_plot.astype(np.int16),calib['Q'])
+# true_pcd = get_points(dataL,calib['Q'])
+# # evaluation = o3d.pipelines.registration.evaluate_registration(
+# #     pred_pcd, true_pcd, 0.5, np.identity(4))
+# #
+# # kdt = cKDTree(np.asarray(true_pcd.points),leafsize=5)
+# # d,i=kdt.query(np.asarray(pred_pcd.points),k=1,distance_upper_bound=0.5)
 
 
 o3d.visualization.draw_geometries([pred_pcd])

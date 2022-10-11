@@ -34,8 +34,8 @@ from torchvision.utils import draw_bounding_boxes
 from torchvision.utils import draw_bounding_boxes
 from torchvision.io import read_image
 from torchvision.ops import nms
-
-
+import cv2
+import getmodel
 
 
 K1 = np.array([[     707.09,           0,      601.89],
@@ -80,20 +80,20 @@ outdir='testing'
 
 # dataloader
 # from dataloader import listfiles as DA
-all_left_img, all_right_img, all_left_disp,_,_,_ = lk15.dataloader('%s/stereo2015/data_scene_flow/training/'%database,typ='train') # change to trainval when finetuning on KITTI
-loader_kitti15 = DA.myImageFloder(all_left_img,all_right_img,all_left_disp,mode='test', rand_scale=[0.9,2.4*1], order=0)
+all_left_img, all_right_img, all_left_disp = lk12.dataloader('/run/user/1000/gvfs/sftp:host=192.168.68.73,user=n.adurthi/home/research/SLAMData/Kitti/stereo2012/training/') # change to trainval when finetuning on KITTI
+loader_kitti12 = DA.myImageFloder(all_left_img,all_right_img,all_left_disp,mode='test', rand_scale=[0.9,2.4*1], order=0)
 
-all_left_img, all_right_img, all_left_disp, all_right_disp = ls.dataloader('%s/Middlebury/mb-ex-training/trainingF'%database)  # mb-ex
-loader_mb = DA.myImageFloder(all_left_img,all_right_img,all_left_disp,right_disparity=all_right_disp,mode='test', rand_scale=[0.225,0.6*1], rand_bright=[0.8,1.2],order=0)
+#all_left_img, all_right_img, all_left_disp, all_right_disp = ls.dataloader('%s/Middlebury/mb-ex-training/trainingF'%database)  # mb-ex
+#loader_mb = DA.myImageFloder(all_left_img,all_right_img,all_left_disp,right_disparity=all_right_disp,mode='test', rand_scale=[0.225,0.6*1], rand_bright=[0.8,1.2],order=0)
 
-loader = loader_kitti15
+loader = loader_kitti12
 
 # f=DA.default_loader(all_left_img[0])
 
 # test_left_img, test_right_img, _, _ = DA.dataloader(datapath)
 
 # construct model
-model = hsm(384,1,level=1)
+model = hsm.HSMNet(384,1,level=1)
 model = nn.DataParallel(model, device_ids=[0])
 model.cuda()
 
@@ -120,6 +120,50 @@ processed = get_transform()
 model.eval()
 inx=1
 
+
+
+
+def getevalmodel(max_disp=384):
+    if max_disp % 16 != 0:
+        max_disp = 16 * np.round(max_disp / 16).astype(int)
+    max_disp = int(max_disp)
+    #
+    #    if max_disp % 64 != 0:
+    #        max_disp = 64 * np.round(max_disp/64).astype(int)
+    #    max_disp = int(max_disp)
+    #
+    tmpdisp = int(max_disp // 64 * 64)
+    if (max_disp / 64 * 64) > tmpdisp:
+        max_disp = tmpdisp + 64
+    else:
+        max_disp = tmpdisp
+    if max_disp == 64:
+        max_disp = 128
+
+    model = hsm.HSMNet(max_disp, clean=1, level=1)
+    model = nn.DataParallel(model)
+    model.cuda()
+
+    loadmodel = os.path.join( 'bestmodels', 'kitti.tar')
+    pretrained_dict = torch.load(loadmodel)
+    pretrained_dict['state_dict'] = {k: v for k, v in pretrained_dict['state_dict'].items() if ('disp' not in k)}
+    model.load_state_dict(pretrained_dict['state_dict'], strict=False)
+
+    model.eval()
+
+    ## change max disp
+
+    model.module.disp_reg8 = disparityregression(model.module.maxdisp, 16).cuda()
+    model.module.disp_reg16 = disparityregression(model.module.maxdisp, 16).cuda()
+    model.module.disp_reg32 = disparityregression(model.module.maxdisp, 32).cuda()
+    model.module.disp_reg64 = disparityregression(model.module.maxdisp, 64).cuda()
+
+    return model
+
+
+
+model2 = getmodel.getevalmodel()
+
 for inx in range(len(loader)):
     print(inx,len(loader))
     imgL_o = loader[inx][0]
@@ -128,10 +172,20 @@ for inx in range(len(loader)):
     leftfile,rightfile = loader[inx][3]
     imgL_o = (skimage.io.imread(leftfile).astype('float32'))[:,:,:3]
     imgR_o = (skimage.io.imread(rightfile).astype('float32'))[:,:,:3]
-    pred_disp
+
     imgsize = imgL_o.shape[:2]
-    
-    
+
+    Limg = cv2.imread(leftfile).astype('float32')
+    Rimg = cv2.imread(rightfile).astype('float32')
+    Limg=cv2.cvtColor(Limg, cv2.COLOR_BGR2RGB)
+    Rimg = cv2.cvtColor(Rimg, cv2.COLOR_BGR2RGB)
+
+
+    # Limg_o = processed(Limg).numpy()
+    # Rimg_o = processed(Rimg).numpy()
+
+    pred2=getmodel.runmodel(model2,Limg,Rimg )
+
     
     
     if max_disp>0:
@@ -158,10 +212,10 @@ for inx in range(len(loader)):
     print(model.module.maxdisp)
     
     # resize
-    imgL_o = cv2.resize(imgL_o,None,fx=testres,fy=testres,interpolation=cv2.INTER_CUBIC)
-    imgR_o = cv2.resize(imgR_o,None,fx=testres,fy=testres,interpolation=cv2.INTER_CUBIC)
-    imgL = processed(imgL_o).numpy()
-    imgR = processed(imgR_o).numpy()
+    imgL_2o = cv2.resize(imgL_o,None,fx=testres,fy=testres,interpolation=cv2.INTER_CUBIC)
+    imgR_2o = cv2.resize(imgR_o,None,fx=testres,fy=testres,interpolation=cv2.INTER_CUBIC)
+    imgL = processed(imgL_2o).numpy()
+    imgR = processed(imgR_2o).numpy()
 
     imgL = np.reshape(imgL,[1,3,imgL.shape[1],imgL.shape[2]])
     imgR = np.reshape(imgR,[1,3,imgR.shape[1],imgR.shape[2]])

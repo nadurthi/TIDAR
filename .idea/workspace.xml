@@ -5,12 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="83b9cf58-4e61-445f-8783-5c8b8a4ff83d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/main_helpers.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/camerahardware/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/camerahardware/.idea/camerahardware.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/camerahardware/blobdetector_setup.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/camerahardware/calib_codes.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/camerahardware/object_points.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/camerahardware/cameras.json" beforeDir="false" afterPath="$PROJECT_DIR$/camerahardware/cameras.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/camerahardware/TIScamsaver.py" beforeDir="false" afterPath="$PROJECT_DIR$/camerahardware/TIScamsaver_calibrator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_stereo_run.py" beforeDir="false" afterPath="$PROJECT_DIR$/main_stereo_run.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_test_cam_rectification.py" beforeDir="false" afterPath="$PROJECT_DIR$/main_test_cam_rectification.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stereocodes/high_res_stereo_master/getmodel.py" beforeDir="false" afterPath="$PROJECT_DIR$/stereocodes/high_res_stereo_master/getmodel.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stereocodes/SGMpython/test_mul.sublime-workspace" beforeDir="false" afterPath="$PROJECT_DIR$/stereocodes/SGMpython/test_mul.sublime-workspace" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,14 +38,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/nvidiaorin/Documents/TIDAR&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "last_opened_file_path": "/home/nvidiaorin/Documents/TIDAR",
+    "settings.editor.selected.configurable": "preferences.keymap"
   }
-}</component>
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/camerahardware" />
+    </key>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">

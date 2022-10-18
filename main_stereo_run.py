@@ -32,7 +32,7 @@ import pickle as pkl
 import os
 from stereocodes.high_res_stereo_master import getmodel
 from main_helpers import *
-
+import threading
 #from stereocodes.high_res_stereo_master import getevalmodel
 
 import stereocodes.SGMpython.gpu_library  as gpu_library
@@ -40,7 +40,7 @@ import stereocodes.SGMpython.gpu_library  as gpu_library
 
 c1=0
 c2=2
-scale=1
+scale=3
 
 
 #%% testing calibrated stereo projection
@@ -58,7 +58,7 @@ config_dict['cameras']['width']=calib_parameters[scale]['size'][1]
 config_dict['libSGM']["P1"]= 5
 config_dict['libSGM']["P2"]= 20
 config_dict['libSGM']["max_disparity"]= 256
-config_dict['libSGM']["min_disparity"]= 16
+config_dict['libSGM']["min_disparity"]= 0
 config_dict['libSGM']["uniqueness"]= 0.98
 config_dict['libSGM']["num_paths"]= 8
 config_dict['libSGM']["LR_max_diff"]= 2
@@ -71,7 +71,7 @@ config_dict['opencv_stereo']["uniquenessRatio"]= 5
 
 
 
-# hsmmodel = getmodel.getevalmodel(max_disp=384)
+hsmmodel = getmodel.getevalmodel(max_disp=384)
 
 # SGM models
 libsgm = gpu_library.Algo_libsgm(json.dumps(config_dict))
@@ -99,7 +99,7 @@ for i in range(len(mTis)):
     cv2.namedWindow('Camera_%d' % i, cv2.WINDOW_NORMAL)
 cv2.namedWindow('Depth', cv2.WINDOW_NORMAL)
 
-class StereoParameterSetter:
+class TIDAR:
     def __init__(self):
         self.libsgm = gpu_library.Algo_libsgm(json.dumps(config_dict))
         self.libopencv = gpu_library.Algo_openCV(json.dumps(config_dict))
@@ -118,15 +118,15 @@ class StereoParameterSetter:
         self.libsgm = gpu_library.Algo_libsgm(json.dumps(config_dict))
         self.libopencv = gpu_library.Algo_openCV(json.dumps(config_dict))
 
-sps=StereoParameterSetter()
+sps=TIDAR()
 
-cv2.createTrackbar("P1", 'Depth' , 5, 300, sps.on_trackbar_P1)
-cv2.createTrackbar("P2", 'Depth' , 15, 500, sps.on_trackbar_P2)
+cv2.createTrackbar("P1", 'Depth' , 2, 300, sps.on_trackbar_P1)
+cv2.createTrackbar("P2", 'Depth' , 2, 500, sps.on_trackbar_P2)
 
 (Lmapx, Lmapy), (Rmapx, Rmapy) = calib_parameters[scale]['stereo_rect'][(c1, c2)][7:9]
 
-Lmapx, Lmapy = cv2.convertMaps(Lmapx, Lmapy, dstmap1type=cv2.CV_16SC2)
-Rmapx, Rmapy = cv2.convertMaps(Rmapx, Rmapy, dstmap1type=cv2.CV_16SC2)
+Lmapx, Lmapy = cv2.convertMaps(Lmapx, Lmapy, dstmap1type=cv2.CV_16SC2,nninterpolation=False)
+Rmapx, Rmapy = cv2.convertMaps(Rmapx, Rmapy, dstmap1type=cv2.CV_16SC2,nninterpolation=False)
 while 1:
     images = mTis.snapImages()
 
@@ -150,9 +150,9 @@ while 1:
     print("gray conversion = ",et-st)
 
     # deep
-    # st = time.time()
-    # disp = getmodel.runmodel(hsmmodel, Ldst.astype('float32'), Rdst.astype('float32'))
-    # et=time.time()
+    st = time.time()
+    disp = getmodel.runmodel(hsmmodel, Ldst.astype('float32'), Rdst.astype('float32'))
+    et=time.time()
 
 
 
@@ -161,10 +161,10 @@ while 1:
     # disp=disp/16
     # disp[disp<=0]=0
 
-    st=time.time()
-    disp = sps.libsgm.getDisparity_gpu(Ldstgray,Rdstgray)
-    et=time.time()
-    print("libsgm time = ",et-st)
+    # st=time.time()
+    # disp = sps.libsgm.getDisparity_gpu(Ldstgray,Rdstgray)
+    # et=time.time()
+    # print("libsgm time = ",et-st)
 
     Q = calib_parameters[scale]['stereo_rect'][(c1, c2)][4]
     depths, depthcolor, pcd = get_colored_depth(Ldst, disp, Q, dmax=100, returnpcd=False)
@@ -197,15 +197,19 @@ while 1:
     #             d=np.round(d[np.isfinite(d)],2)
     #         cv2.rectangle(Ldst,(boxes_f[i][0],boxes_f[i][1]),(boxes_f[i][2],boxes_f[i][3]),(0,255,0),2)
     #         cv2.putText(Ldst,str(labels_f[i])+" : "+str(scores_f[i])+" || {0:.2f},{0:.2f},{0:.2f}".format(np.min(d),np.mean(d),np.max(d)),(boxes_f[i][0],boxes_f[i][1]-10),0,1,(0,255,0),2)
-
-
-    et = time.time()
-    print("yolo time = ",et-st)
+    # et = time.time()
+    # print("yolo time = ",et-st)
 
     #% plotting ------------------------------
     imagesdst=[Ldst,Rdst]
     for i in range(len(imagesdst)):
-        cv2.imshow('Camera_%d' % i, imagesdst[i])
+        line_thickness = 2
+        h,w=imagesdst[i].shape[:2]
+        for x in np.linspace(0 + 10, h - 10, 30):
+            cv2.line(imagesdst[i], (0, int(x)), (w, int(x)), (0, 255, 0), thickness=line_thickness)
+            cv2.line(imagesdst[i], (0, int(x)), (w, int(x)), (255, 0, 0), thickness=line_thickness)
+
+    cv2.imshow('Camera_%d' % 0, np.hstack(imagesdst[:2]))
 
 
     cv2.imshow("Depth", depthcolor)

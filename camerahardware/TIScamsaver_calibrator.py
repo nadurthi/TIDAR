@@ -42,6 +42,7 @@ def imagesaver(q,exitflg,size):
     
     cnt=0
     imgpoints = [{}, {}, {}]  # 2d points in image plane.
+
     while True:
         try:
             img,CC = q.get(timeout=0.05)
@@ -69,11 +70,11 @@ def imagesaver(q,exitflg,size):
                     np.savez(os.path.join(savefolder,saveset,ff), X=X)
                     i=-1
             try:
-                objp = object_points.objp_acircular4_11
+                objp = object_points.objp_checker
                 ho,wo=img[0].shape[:2]
-                calib_parameters = calib_codes.calibrate_Cameras(img[0].copy(), ho, wo, imgpoints, objp)
-                print("L-R : ",calib_parameters[1]['stereo'][(0,2)][5])
-                print("L-M : ", calib_parameters[1]['stereo'][(0, 1)][5])
+                calib_parameters = calib_codes.calibrate_Cameras(img[0].copy(), ho, wo, imgpoints, objp,scales=[3])
+                print("L-R : ",calib_parameters[3]['stereo'][(0,2)][5])
+                print("L-M : ", calib_parameters[3]['stereo'][(0, 1)][5])
             except:
                 print("failed calib")
 
@@ -137,7 +138,8 @@ if __name__=="__main__":
         for i in range(len(mTis)):
             cv2windows.append(cv2.namedWindow('Camera_%d'%i, cv2.WINDOW_NORMAL))
 
-
+        prev_img_points=None
+        t0 = time.time()
         while 1:
     #        time.sleep(1)
             images = mTis.snapImages()
@@ -152,12 +154,16 @@ if __name__=="__main__":
             RET=[]
             CC={0:[],1:[],2:[],3:[]}
             for jj in range(len(mTis)):
-                # ret, cor = cv2.findChessboardCornersSB(gray_imgs[jj], (4,5), cv2.CALIB_CB_EXHAUSTIVE + cv2.CALIB_CB_NORMALIZE_IMAGE)
-                ret, cor = cv2.findCirclesGrid(images[jj], (4,11), cv2.CALIB_CB_ASYMMETRIC_GRID ,blobDetector,None   )
                 Limg = images[jj].copy()
+                grayimg = cv2.cvtColor(images[jj], cv2.COLOR_BGR2GRAY)  #images[jj].copy()
+                # ret, cor = cv2.findChessboardCornersSB(gray_imgs[jj], (4,5), cv2.CALIB_CB_EXHAUSTIVE + cv2.CALIB_CB_NORMALIZE_IMAGE)
+                # ret, cor = cv2.findCirclesGrid(images[jj], (4,11), cv2.CALIB_CB_ASYMMETRIC_GRID ,blobDetector,None   )
+                ret, cor = calib_codes.getchesspattern(grayimg)
+
+
                 if ret:
-                    # cv2.drawChessboardCorners(gray_imgs[jj], (4,5), cor, ret)
-                    cv2.drawChessboardCorners(Limg, (4,11), cor, ret)
+                    cv2.drawChessboardCorners(Limg, (4,5), cor, ret)
+                    # cv2.drawChessboardCorners(Limg, (4,11), cor, ret)
                     CC[jj]=cor
                     corners2L=np.vstack(cor)
                     mn=np.min(corners2L,axis=0)
@@ -179,6 +185,7 @@ if __name__=="__main__":
                 cv2.imshow('Camera_%d'%i, gray_cropped[i])
 
     #        cv2.imshow('Window', np.hstack(images))  # Display the result
+            tf=time.time()
 
             lastkey = cv2.waitKey(10)
             if lastkey == 27 or lastkey == 113:
@@ -186,7 +193,9 @@ if __name__=="__main__":
             if saveonclick and lastkey == 115:
                 q.put((images,CC))
                 print("saved: ",datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
-            if np.all(RET):
+            if np.all(RET) and (prev_img_points is None or np.max(np.linalg.norm(prev_img_points-CC[0],axis=1))>100) and (tf-t0)>2:
+                prev_img_points = CC[0]
+                t0=time.time()
                 q.put((images, CC))
                 print("saved: ", datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
 
@@ -212,7 +221,8 @@ if __name__=="__main__":
                 for cj in range(3):
                     ff = '%05d_%02d.png' % (si, cj)
                     Limg_o = cv2.imread(os.path.join(savefolder, saveset, ff))
-                    ret, cor = cv2.findCirclesGrid(Limg_o, (4, 11), cv2.CALIB_CB_ASYMMETRIC_GRID, blobDetector, None)
+                    # ret, cor = cv2.findCirclesGrid(Limg_o, (4, 11), cv2.CALIB_CB_ASYMMETRIC_GRID, blobDetector, None)
+                    retL,cor=calib_codes.getchesspattern(Limg_o)
                     if ret:
                         imgpoints[cj][si]=cor
         else:
@@ -225,7 +235,7 @@ if __name__=="__main__":
 
 
 
-        objp = object_points.objp_acircular4_11
+        objp = object_points.objp_checker
         calib_parameters=calib_codes.calibrate_Cameras(Limg_o, ho, wo, imgpoints, objp)
 
         # plt.show()
@@ -234,5 +244,5 @@ if __name__=="__main__":
             pkl.dump(calib_parameters,F)
 
 
-        with open(os.path.join(savefolder, saveset, 'calibrated_camera_parameters.json'), 'wb') as F:
-            json.dump(calib_parameters,F, indent=4)
+        # with open(os.path.join(savefolder, saveset, 'calibrated_camera_parameters.json'), 'wb') as F:
+        #     json.dump(calib_parameters,F, indent=4)

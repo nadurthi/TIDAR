@@ -6,8 +6,6 @@ objp_checker[:,:2] = np.mgrid[0:4,0:5].T.reshape(-1,2)
 objp_checker = objp_checker*0.175
 
 
-
-
 dia = 0.065
 gap = 0.140
 dy = gap*np.sqrt(2)

@@ -1,8 +1,27 @@
 import cv2
 import numpy as np
 import pickle as pkl
+import time
+def getchesspattern(Limg_o,fast=False):
+    st=time.time()
+    if fast:
+        retL, cor = cv2.findChessboardCorners(Limg_o, (4, 5), cv2.CALIB_CB_FAST_CHECK  + cv2.CALIB_CB_ADAPTIVE_THRESH+cv2.CALIB_CB_FILTER_QUADS)
+    else:
+        Limg_o11= cv2.resize(Limg_o, None, fx=1 / 3, fy=1 / 3, interpolation=cv2.INTER_AREA)
+        retL, cor = cv2.findChessboardCorners(Limg_o11, (4, 5),cv2.CALIB_CB_FAST_CHECK + cv2.CALIB_CB_ADAPTIVE_THRESH + cv2.CALIB_CB_FILTER_QUADS)
+        if retL:
+            cor=3*cor
+    et = time.time()
+    # print("chess board detectio time = ",et-st)
+    if retL:
+        st = time.time()
+        criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+        et=time.time()
+        # print("subpixel refine = ", et - st)
+        cor = cv2.cornerSubPix(Limg_o, cor, (11, 11), (-1, -1), criteria)
 
-def calibrate_Cameras(Limg_o,ho,wo,imgpoints,object_points):
+    return retL,cor
+def calibrate_Cameras(Limg_o,ho,wo,imgpoints,object_points,scales=None):
 
 
     idxs = set(imgpoints[0].keys()) & set(imgpoints[1].keys()) & set(imgpoints[2].keys())
@@ -17,14 +36,15 @@ def calibrate_Cameras(Limg_o,ho,wo,imgpoints,object_points):
             imgpointsR_list_o.append(imgpoints[2][i].astype(np.float32))
             objpointsL_list.append(object_points)
 
-
+    if scales is None:
+        scales=range(1,4)
     calib_parameters={}
-    for scale in range(1,4):
+    for scale in scales:
         print("scale = ",scale)
         h=int(ho/scale)
         w=int(wo/scale)
         calib_parameters[scale]={'size':(h,w),'scale':scale}
-        Limg =cv2.resize(Limg_o,None,fx=1/scale,fy=1/scale,interpolation=cv2.INTER_AREA)
+        Limg =cv2.resize(Limg_o.copy(),None,fx=1/scale,fy=1/scale,interpolation=cv2.INTER_AREA)
         imgpointsL_list=[a/scale for a in imgpointsL_list_o]
         imgpointsM_list = [a / scale for a in imgpointsM_list_o]
         imgpointsR_list = [a / scale for a in imgpointsR_list_o]

@@ -143,6 +143,8 @@ py::array_t<uint8_t> flipcvMat(py::array_t<uint8_t>& img)
 }
 
 
+
+
 PYBIND11_MODULE(gpu_library, m)
 {
   m.def("multiply_with_scalar", map_array<double>);
@@ -150,6 +152,7 @@ PYBIND11_MODULE(gpu_library, m)
   m.def("take_json", &take_json, "pass py::object to a C++ function that takes an nlohmann::json");
   m.def("return_json", &return_json, "return py::object from a C++ function that returns an nlohmann::json");
   m.def("flipcvMat", &flipcvMat, "flipcvMat");
+
 
 
   py::class_<Algo_libsgm>(m, "Algo_libsgm")

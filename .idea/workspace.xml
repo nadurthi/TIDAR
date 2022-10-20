@@ -6,10 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="83b9cf58-4e61-445f-8783-5c8b8a4ff83d" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/camerahardware/TIScamsaver_calibrator.py" beforeDir="false" afterPath="$PROJECT_DIR$/camerahardware/TIScamsaver_calibrator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/camerahardware/calib_codes.py" beforeDir="false" afterPath="$PROJECT_DIR$/camerahardware/calib_codes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/camerahardware/object_points.py" beforeDir="false" afterPath="$PROJECT_DIR$/camerahardware/object_points.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_stereo_run.py" beforeDir="false" afterPath="$PROJECT_DIR$/main_stereo_run.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/multicam_config.json" beforeDir="false" afterPath="$PROJECT_DIR$/multicam_config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stereocodes/SGMpython/gpu_library.cu" beforeDir="false" afterPath="$PROJECT_DIR$/stereocodes/SGMpython/gpu_library.cu" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stereocodes/SGMpython/include/libsgm_stereo.h" beforeDir="false" afterPath="$PROJECT_DIR$/stereocodes/SGMpython/include/libsgm_stereo.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stereocodes/SGMpython/include/opencv_stereo.h" beforeDir="false" afterPath="$PROJECT_DIR$/stereocodes/SGMpython/include/opencv_stereo.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stereocodes/SGMpython/libsgm_stereo.cu" beforeDir="false" afterPath="$PROJECT_DIR$/stereocodes/SGMpython/libsgm_stereo.cu" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stereocodes/SGMpython/test_mul.sublime-workspace" beforeDir="false" afterPath="$PROJECT_DIR$/stereocodes/SGMpython/test_mul.sublime-workspace" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -15,7 +15,13 @@ Algo_libsgm::Algo_libsgm(std::string opt ){
 	int max_disparity = options["libSGM"]["max_disparity"];
 	int LR_max_diff = options["libSGM"]["LR_max_diff"];
 
-   
+  
+
+  wls_filter = createDisparityWLSFilterGeneric(false);
+	wls_filter->setDepthDiscontinuityRadius(options["WLS"]["radius"]); //0.5*16
+	wls_filter->setLambda(options["WLS"]["lambda"]); //8000
+	wls_filter->setSigmaColor(options["WLS"]["sigma"]);//1.5
+
  //   int disp_size = 128;
 	// int P1 = 20;
 	// int P2 = 84;
@@ -122,7 +128,7 @@ py::array_t<int16_t>  Algo_libsgm::getDisparity_gpu(py::array_t<uint8_t>& Xleft,
 	cv::Mat left(Xleft.shape(0), Xleft.shape(1), CV_8U, (unsigned char*)Xleft.data());
 	cv::Mat right(Xright.shape(0), Xright.shape(1), CV_8U, (unsigned char*)Xright.data());
 
-	cv::Mat disparity_gpu;
+	cv::Mat disparity_gpu,filtered_disp;
 
 	
 	cv::cuda::GpuMat d_left, d_right, d_disparity;
@@ -134,7 +140,11 @@ py::array_t<int16_t>  Algo_libsgm::getDisparity_gpu(py::array_t<uint8_t>& Xleft,
 	disparity_gpu.setTo(0, maskgpu);
 
 
+	// auto wls = cv::ximgproc::DisparityWLSFilter();
 	
+	wls_filter->filter(disparity_gpu,left,filtered_disp);
+	disparity_gpu=filtered_disp;
+
   size_t rows = disparity_gpu.rows;
 	size_t cols = disparity_gpu.cols;
 	py::array_t<int16_t> output(

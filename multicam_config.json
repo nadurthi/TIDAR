@@ -17,6 +17,11 @@
         "high_res_stereo_dnn": "yes",
         "cdn_dnn": "yes"
     },
+    "WLS": {
+        "lambda": 8000,
+        "sigma": 1.5,
+        "radius": 16
+    },
     "opencv_stereo": {
         "P1": 7,
         "P2": 84,

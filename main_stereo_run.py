@@ -117,11 +117,29 @@ class TIDAR:
         print(val)
         self.libsgm = gpu_library.Algo_libsgm(json.dumps(config_dict))
         self.libopencv = gpu_library.Algo_openCV(json.dumps(config_dict))
+    def on_trackbar_lambda(self,val):
+        config_dict['WLS']["lambda"]=val
+        print(val)
+        self.libsgm = gpu_library.Algo_libsgm(json.dumps(config_dict))
+        self.libopencv = gpu_library.Algo_openCV(json.dumps(config_dict))
 
+    def on_trackbar_sigma(self,val):
+        config_dict['WLS']["sigma"]=val
+        print(val)
+        self.libsgm = gpu_library.Algo_libsgm(json.dumps(config_dict))
+        self.libopencv = gpu_library.Algo_openCV(json.dumps(config_dict))
+    def on_trackbar_radius(self,val):
+        config_dict['WLS']["radius"]=val
+        print(val)
+        self.libsgm = gpu_library.Algo_libsgm(json.dumps(config_dict))
+        self.libopencv = gpu_library.Algo_openCV(json.dumps(config_dict))
 sps=TIDAR()
 
 cv2.createTrackbar("P1", 'Depth' , 2, 300, sps.on_trackbar_P1)
 cv2.createTrackbar("P2", 'Depth' , 2, 500, sps.on_trackbar_P2)
+cv2.createTrackbar("radius", 'Depth' , 2, 100, sps.on_trackbar_radius)
+cv2.createTrackbar("sigma", 'Depth' , 2, 500, sps.on_trackbar_sigma)
+cv2.createTrackbar("lambda", 'Depth' , 1000, 20000, sps.on_trackbar_lambda)
 
 (Lmapx, Lmapy), (Rmapx, Rmapy) = calib_parameters[scale]['stereo_rect'][(c1, c2)][7:9]
 
@@ -150,9 +168,9 @@ while 1:
     print("gray conversion = ",et-st)
 
     # deep
-    st = time.time()
-    disp = getmodel.runmodel(hsmmodel, Ldst.astype('float32'), Rdst.astype('float32'))
-    et=time.time()
+    # st = time.time()
+    # disp = getmodel.runmodel(hsmmodel, Ldst.astype('float32'), Rdst.astype('float32'))
+    # et=time.time()
 
 
 
@@ -161,10 +179,10 @@ while 1:
     # disp=disp/16
     # disp[disp<=0]=0
 
-    # st=time.time()
-    # disp = sps.libsgm.getDisparity_gpu(Ldstgray,Rdstgray)
-    # et=time.time()
-    # print("libsgm time = ",et-st)
+    st=time.time()
+    disp = sps.libsgm.getDisparity_gpu(Ldstgray,Rdstgray)
+    et=time.time()
+    print("libsgm time = ",et-st)
 
     Q = calib_parameters[scale]['stereo_rect'][(c1, c2)][4]
     depths, depthcolor, pcd = get_colored_depth(Ldst, disp, Q, dmax=100, returnpcd=False)

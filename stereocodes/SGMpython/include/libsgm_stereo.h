@@ -39,6 +39,16 @@
 #include <array>
 #include <iomanip>
 #include <memory>
+// #include <opencv2/ximgproc/disparity_filter.hpp>
+#include "opencv2/ximgproc.hpp"
+#include "opencv2/calib3d.hpp"
+#include "opencv2/imgproc.hpp"
+#include "opencv2/imgcodecs.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/core/utility.hpp"
+
+using namespace cv;
+using namespace cv::ximgproc;
 
 #define ASSERT_MSG(expr, msg) \
 								if (!(expr)) { \
@@ -62,6 +72,9 @@ std::unique_ptr<sgm::StereoSGM> ssgm_ptr;
 std::unique_ptr<sgm::StereoSGM> ssgm_cuda_ptr;
 std::unique_ptr<sgm::LibSGMWrapper> sgmgpu_ptr;
 sgm::StereoSGM::Parameters param;
+
+Ptr<DisparityWLSFilter> wls_filter;
+
 };
 
 

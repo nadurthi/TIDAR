@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "rcutils/allocator.h"
+
 
 // Include directives for member types
 // Member `header`
@@ -46,17 +48,62 @@ velodyne_msgs__msg__VelodyneScan__fini(velodyne_msgs__msg__VelodyneScan * msg)
   velodyne_msgs__msg__VelodynePacket__Sequence__fini(&msg->packets);
 }
 
+bool
+velodyne_msgs__msg__VelodyneScan__are_equal(const velodyne_msgs__msg__VelodyneScan * lhs, const velodyne_msgs__msg__VelodyneScan * rhs)
+{
+  if (!lhs || !rhs) {
+    return false;
+  }
+  // header
+  if (!std_msgs__msg__Header__are_equal(
+      &(lhs->header), &(rhs->header)))
+  {
+    return false;
+  }
+  // packets
+  if (!velodyne_msgs__msg__VelodynePacket__Sequence__are_equal(
+      &(lhs->packets), &(rhs->packets)))
+  {
+    return false;
+  }
+  return true;
+}
+
+bool
+velodyne_msgs__msg__VelodyneScan__copy(
+  const velodyne_msgs__msg__VelodyneScan * input,
+  velodyne_msgs__msg__VelodyneScan * output)
+{
+  if (!input || !output) {
+    return false;
+  }
+  // header
+  if (!std_msgs__msg__Header__copy(
+      &(input->header), &(output->header)))
+  {
+    return false;
+  }
+  // packets
+  if (!velodyne_msgs__msg__VelodynePacket__Sequence__copy(
+      &(input->packets), &(output->packets)))
+  {
+    return false;
+  }
+  return true;
+}
+
 velodyne_msgs__msg__VelodyneScan *
 velodyne_msgs__msg__VelodyneScan__create()
 {
-  velodyne_msgs__msg__VelodyneScan * msg = (velodyne_msgs__msg__VelodyneScan *)malloc(sizeof(velodyne_msgs__msg__VelodyneScan));
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  velodyne_msgs__msg__VelodyneScan * msg = (velodyne_msgs__msg__VelodyneScan *)allocator.allocate(sizeof(velodyne_msgs__msg__VelodyneScan), allocator.state);
   if (!msg) {
     return NULL;
   }
   memset(msg, 0, sizeof(velodyne_msgs__msg__VelodyneScan));
   bool success = velodyne_msgs__msg__VelodyneScan__init(msg);
   if (!success) {
-    free(msg);
+    allocator.deallocate(msg, allocator.state);
     return NULL;
   }
   return msg;
@@ -65,10 +112,11 @@ velodyne_msgs__msg__VelodyneScan__create()
 void
 velodyne_msgs__msg__VelodyneScan__destroy(velodyne_msgs__msg__VelodyneScan * msg)
 {
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   if (msg) {
     velodyne_msgs__msg__VelodyneScan__fini(msg);
   }
-  free(msg);
+  allocator.deallocate(msg, allocator.state);
 }
 
 
@@ -78,9 +126,11 @@ velodyne_msgs__msg__VelodyneScan__Sequence__init(velodyne_msgs__msg__VelodyneSca
   if (!array) {
     return false;
   }
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   velodyne_msgs__msg__VelodyneScan * data = NULL;
+
   if (size) {
-    data = (velodyne_msgs__msg__VelodyneScan *)calloc(size, sizeof(velodyne_msgs__msg__VelodyneScan));
+    data = (velodyne_msgs__msg__VelodyneScan *)allocator.zero_allocate(size, sizeof(velodyne_msgs__msg__VelodyneScan), allocator.state);
     if (!data) {
       return false;
     }
@@ -97,7 +147,7 @@ velodyne_msgs__msg__VelodyneScan__Sequence__init(velodyne_msgs__msg__VelodyneSca
       for (; i > 0; --i) {
         velodyne_msgs__msg__VelodyneScan__fini(&data[i - 1]);
       }
-      free(data);
+      allocator.deallocate(data, allocator.state);
       return false;
     }
   }
@@ -113,6 +163,8 @@ velodyne_msgs__msg__VelodyneScan__Sequence__fini(velodyne_msgs__msg__VelodyneSca
   if (!array) {
     return;
   }
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+
   if (array->data) {
     // ensure that data and capacity values are consistent
     assert(array->capacity > 0);
@@ -120,7 +172,7 @@ velodyne_msgs__msg__VelodyneScan__Sequence__fini(velodyne_msgs__msg__VelodyneSca
     for (size_t i = 0; i < array->capacity; ++i) {
       velodyne_msgs__msg__VelodyneScan__fini(&array->data[i]);
     }
-    free(array->data);
+    allocator.deallocate(array->data, allocator.state);
     array->data = NULL;
     array->size = 0;
     array->capacity = 0;
@@ -134,13 +186,14 @@ velodyne_msgs__msg__VelodyneScan__Sequence__fini(velodyne_msgs__msg__VelodyneSca
 velodyne_msgs__msg__VelodyneScan__Sequence *
 velodyne_msgs__msg__VelodyneScan__Sequence__create(size_t size)
 {
-  velodyne_msgs__msg__VelodyneScan__Sequence * array = (velodyne_msgs__msg__VelodyneScan__Sequence *)malloc(sizeof(velodyne_msgs__msg__VelodyneScan__Sequence));
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  velodyne_msgs__msg__VelodyneScan__Sequence * array = (velodyne_msgs__msg__VelodyneScan__Sequence *)allocator.allocate(sizeof(velodyne_msgs__msg__VelodyneScan__Sequence), allocator.state);
   if (!array) {
     return NULL;
   }
   bool success = velodyne_msgs__msg__VelodyneScan__Sequence__init(array, size);
   if (!success) {
-    free(array);
+    allocator.deallocate(array, allocator.state);
     return NULL;
   }
   return array;
@@ -149,8 +202,66 @@ velodyne_msgs__msg__VelodyneScan__Sequence__create(size_t size)
 void
 velodyne_msgs__msg__VelodyneScan__Sequence__destroy(velodyne_msgs__msg__VelodyneScan__Sequence * array)
 {
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   if (array) {
     velodyne_msgs__msg__VelodyneScan__Sequence__fini(array);
   }
-  free(array);
+  allocator.deallocate(array, allocator.state);
+}
+
+bool
+velodyne_msgs__msg__VelodyneScan__Sequence__are_equal(const velodyne_msgs__msg__VelodyneScan__Sequence * lhs, const velodyne_msgs__msg__VelodyneScan__Sequence * rhs)
+{
+  if (!lhs || !rhs) {
+    return false;
+  }
+  if (lhs->size != rhs->size) {
+    return false;
+  }
+  for (size_t i = 0; i < lhs->size; ++i) {
+    if (!velodyne_msgs__msg__VelodyneScan__are_equal(&(lhs->data[i]), &(rhs->data[i]))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool
+velodyne_msgs__msg__VelodyneScan__Sequence__copy(
+  const velodyne_msgs__msg__VelodyneScan__Sequence * input,
+  velodyne_msgs__msg__VelodyneScan__Sequence * output)
+{
+  if (!input || !output) {
+    return false;
+  }
+  if (output->capacity < input->size) {
+    const size_t allocation_size =
+      input->size * sizeof(velodyne_msgs__msg__VelodyneScan);
+    velodyne_msgs__msg__VelodyneScan * data =
+      (velodyne_msgs__msg__VelodyneScan *)realloc(output->data, allocation_size);
+    if (!data) {
+      return false;
+    }
+    for (size_t i = output->capacity; i < input->size; ++i) {
+      if (!velodyne_msgs__msg__VelodyneScan__init(&data[i])) {
+        /* free currently allocated and return false */
+        for (; i-- > output->capacity; ) {
+          velodyne_msgs__msg__VelodyneScan__fini(&data[i]);
+        }
+        free(data);
+        return false;
+      }
+    }
+    output->data = data;
+    output->capacity = input->size;
+  }
+  output->size = input->size;
+  for (size_t i = 0; i < input->size; ++i) {
+    if (!velodyne_msgs__msg__VelodyneScan__copy(
+        &(input->data[i]), &(output->data[i])))
+    {
+      return false;
+    }
+  }
+  return true;
 }

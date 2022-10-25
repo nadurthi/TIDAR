@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "rcutils/allocator.h"
+
 
 bool
 turtlesim__action__RotateAbsolute_Goal__init(turtlesim__action__RotateAbsolute_Goal * msg)
@@ -28,17 +30,44 @@ turtlesim__action__RotateAbsolute_Goal__fini(turtlesim__action__RotateAbsolute_G
   // theta
 }
 
+bool
+turtlesim__action__RotateAbsolute_Goal__are_equal(const turtlesim__action__RotateAbsolute_Goal * lhs, const turtlesim__action__RotateAbsolute_Goal * rhs)
+{
+  if (!lhs || !rhs) {
+    return false;
+  }
+  // theta
+  if (lhs->theta != rhs->theta) {
+    return false;
+  }
+  return true;
+}
+
+bool
+turtlesim__action__RotateAbsolute_Goal__copy(
+  const turtlesim__action__RotateAbsolute_Goal * input,
+  turtlesim__action__RotateAbsolute_Goal * output)
+{
+  if (!input || !output) {
+    return false;
+  }
+  // theta
+  output->theta = input->theta;
+  return true;
+}
+
 turtlesim__action__RotateAbsolute_Goal *
 turtlesim__action__RotateAbsolute_Goal__create()
 {
-  turtlesim__action__RotateAbsolute_Goal * msg = (turtlesim__action__RotateAbsolute_Goal *)malloc(sizeof(turtlesim__action__RotateAbsolute_Goal));
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  turtlesim__action__RotateAbsolute_Goal * msg = (turtlesim__action__RotateAbsolute_Goal *)allocator.allocate(sizeof(turtlesim__action__RotateAbsolute_Goal), allocator.state);
   if (!msg) {
     return NULL;
   }
   memset(msg, 0, sizeof(turtlesim__action__RotateAbsolute_Goal));
   bool success = turtlesim__action__RotateAbsolute_Goal__init(msg);
   if (!success) {
-    free(msg);
+    allocator.deallocate(msg, allocator.state);
     return NULL;
   }
   return msg;
@@ -47,10 +76,11 @@ turtlesim__action__RotateAbsolute_Goal__create()
 void
 turtlesim__action__RotateAbsolute_Goal__destroy(turtlesim__action__RotateAbsolute_Goal * msg)
 {
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   if (msg) {
     turtlesim__action__RotateAbsolute_Goal__fini(msg);
   }
-  free(msg);
+  allocator.deallocate(msg, allocator.state);
 }
 
 
@@ -60,9 +90,11 @@ turtlesim__action__RotateAbsolute_Goal__Sequence__init(turtlesim__action__Rotate
   if (!array) {
     return false;
   }
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   turtlesim__action__RotateAbsolute_Goal * data = NULL;
+
   if (size) {
-    data = (turtlesim__action__RotateAbsolute_Goal *)calloc(size, sizeof(turtlesim__action__RotateAbsolute_Goal));
+    data = (turtlesim__action__RotateAbsolute_Goal *)allocator.zero_allocate(size, sizeof(turtlesim__action__RotateAbsolute_Goal), allocator.state);
     if (!data) {
       return false;
     }
@@ -79,7 +111,7 @@ turtlesim__action__RotateAbsolute_Goal__Sequence__init(turtlesim__action__Rotate
       for (; i > 0; --i) {
         turtlesim__action__RotateAbsolute_Goal__fini(&data[i - 1]);
       }
-      free(data);
+      allocator.deallocate(data, allocator.state);
       return false;
     }
   }
@@ -95,6 +127,8 @@ turtlesim__action__RotateAbsolute_Goal__Sequence__fini(turtlesim__action__Rotate
   if (!array) {
     return;
   }
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+
   if (array->data) {
     // ensure that data and capacity values are consistent
     assert(array->capacity > 0);
@@ -102,7 +136,7 @@ turtlesim__action__RotateAbsolute_Goal__Sequence__fini(turtlesim__action__Rotate
     for (size_t i = 0; i < array->capacity; ++i) {
       turtlesim__action__RotateAbsolute_Goal__fini(&array->data[i]);
     }
-    free(array->data);
+    allocator.deallocate(array->data, allocator.state);
     array->data = NULL;
     array->size = 0;
     array->capacity = 0;
@@ -116,13 +150,14 @@ turtlesim__action__RotateAbsolute_Goal__Sequence__fini(turtlesim__action__Rotate
 turtlesim__action__RotateAbsolute_Goal__Sequence *
 turtlesim__action__RotateAbsolute_Goal__Sequence__create(size_t size)
 {
-  turtlesim__action__RotateAbsolute_Goal__Sequence * array = (turtlesim__action__RotateAbsolute_Goal__Sequence *)malloc(sizeof(turtlesim__action__RotateAbsolute_Goal__Sequence));
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  turtlesim__action__RotateAbsolute_Goal__Sequence * array = (turtlesim__action__RotateAbsolute_Goal__Sequence *)allocator.allocate(sizeof(turtlesim__action__RotateAbsolute_Goal__Sequence), allocator.state);
   if (!array) {
     return NULL;
   }
   bool success = turtlesim__action__RotateAbsolute_Goal__Sequence__init(array, size);
   if (!success) {
-    free(array);
+    allocator.deallocate(array, allocator.state);
     return NULL;
   }
   return array;
@@ -131,10 +166,68 @@ turtlesim__action__RotateAbsolute_Goal__Sequence__create(size_t size)
 void
 turtlesim__action__RotateAbsolute_Goal__Sequence__destroy(turtlesim__action__RotateAbsolute_Goal__Sequence * array)
 {
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   if (array) {
     turtlesim__action__RotateAbsolute_Goal__Sequence__fini(array);
   }
-  free(array);
+  allocator.deallocate(array, allocator.state);
+}
+
+bool
+turtlesim__action__RotateAbsolute_Goal__Sequence__are_equal(const turtlesim__action__RotateAbsolute_Goal__Sequence * lhs, const turtlesim__action__RotateAbsolute_Goal__Sequence * rhs)
+{
+  if (!lhs || !rhs) {
+    return false;
+  }
+  if (lhs->size != rhs->size) {
+    return false;
+  }
+  for (size_t i = 0; i < lhs->size; ++i) {
+    if (!turtlesim__action__RotateAbsolute_Goal__are_equal(&(lhs->data[i]), &(rhs->data[i]))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool
+turtlesim__action__RotateAbsolute_Goal__Sequence__copy(
+  const turtlesim__action__RotateAbsolute_Goal__Sequence * input,
+  turtlesim__action__RotateAbsolute_Goal__Sequence * output)
+{
+  if (!input || !output) {
+    return false;
+  }
+  if (output->capacity < input->size) {
+    const size_t allocation_size =
+      input->size * sizeof(turtlesim__action__RotateAbsolute_Goal);
+    turtlesim__action__RotateAbsolute_Goal * data =
+      (turtlesim__action__RotateAbsolute_Goal *)realloc(output->data, allocation_size);
+    if (!data) {
+      return false;
+    }
+    for (size_t i = output->capacity; i < input->size; ++i) {
+      if (!turtlesim__action__RotateAbsolute_Goal__init(&data[i])) {
+        /* free currently allocated and return false */
+        for (; i-- > output->capacity; ) {
+          turtlesim__action__RotateAbsolute_Goal__fini(&data[i]);
+        }
+        free(data);
+        return false;
+      }
+    }
+    output->data = data;
+    output->capacity = input->size;
+  }
+  output->size = input->size;
+  for (size_t i = 0; i < input->size; ++i) {
+    if (!turtlesim__action__RotateAbsolute_Goal__copy(
+        &(input->data[i]), &(output->data[i])))
+    {
+      return false;
+    }
+  }
+  return true;
 }
 
 
@@ -157,17 +250,44 @@ turtlesim__action__RotateAbsolute_Result__fini(turtlesim__action__RotateAbsolute
   // delta
 }
 
+bool
+turtlesim__action__RotateAbsolute_Result__are_equal(const turtlesim__action__RotateAbsolute_Result * lhs, const turtlesim__action__RotateAbsolute_Result * rhs)
+{
+  if (!lhs || !rhs) {
+    return false;
+  }
+  // delta
+  if (lhs->delta != rhs->delta) {
+    return false;
+  }
+  return true;
+}
+
+bool
+turtlesim__action__RotateAbsolute_Result__copy(
+  const turtlesim__action__RotateAbsolute_Result * input,
+  turtlesim__action__RotateAbsolute_Result * output)
+{
+  if (!input || !output) {
+    return false;
+  }
+  // delta
+  output->delta = input->delta;
+  return true;
+}
+
 turtlesim__action__RotateAbsolute_Result *
 turtlesim__action__RotateAbsolute_Result__create()
 {
-  turtlesim__action__RotateAbsolute_Result * msg = (turtlesim__action__RotateAbsolute_Result *)malloc(sizeof(turtlesim__action__RotateAbsolute_Result));
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  turtlesim__action__RotateAbsolute_Result * msg = (turtlesim__action__RotateAbsolute_Result *)allocator.allocate(sizeof(turtlesim__action__RotateAbsolute_Result), allocator.state);
   if (!msg) {
     return NULL;
   }
   memset(msg, 0, sizeof(turtlesim__action__RotateAbsolute_Result));
   bool success = turtlesim__action__RotateAbsolute_Result__init(msg);
   if (!success) {
-    free(msg);
+    allocator.deallocate(msg, allocator.state);
     return NULL;
   }
   return msg;
@@ -176,10 +296,11 @@ turtlesim__action__RotateAbsolute_Result__create()
 void
 turtlesim__action__RotateAbsolute_Result__destroy(turtlesim__action__RotateAbsolute_Result * msg)
 {
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   if (msg) {
     turtlesim__action__RotateAbsolute_Result__fini(msg);
   }
-  free(msg);
+  allocator.deallocate(msg, allocator.state);
 }
 
 
@@ -189,9 +310,11 @@ turtlesim__action__RotateAbsolute_Result__Sequence__init(turtlesim__action__Rota
   if (!array) {
     return false;
   }
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   turtlesim__action__RotateAbsolute_Result * data = NULL;
+
   if (size) {
-    data = (turtlesim__action__RotateAbsolute_Result *)calloc(size, sizeof(turtlesim__action__RotateAbsolute_Result));
+    data = (turtlesim__action__RotateAbsolute_Result *)allocator.zero_allocate(size, sizeof(turtlesim__action__RotateAbsolute_Result), allocator.state);
     if (!data) {
       return false;
     }
@@ -208,7 +331,7 @@ turtlesim__action__RotateAbsolute_Result__Sequence__init(turtlesim__action__Rota
       for (; i > 0; --i) {
         turtlesim__action__RotateAbsolute_Result__fini(&data[i - 1]);
       }
-      free(data);
+      allocator.deallocate(data, allocator.state);
       return false;
     }
   }
@@ -224,6 +347,8 @@ turtlesim__action__RotateAbsolute_Result__Sequence__fini(turtlesim__action__Rota
   if (!array) {
     return;
   }
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+
   if (array->data) {
     // ensure that data and capacity values are consistent
     assert(array->capacity > 0);
@@ -231,7 +356,7 @@ turtlesim__action__RotateAbsolute_Result__Sequence__fini(turtlesim__action__Rota
     for (size_t i = 0; i < array->capacity; ++i) {
       turtlesim__action__RotateAbsolute_Result__fini(&array->data[i]);
     }
-    free(array->data);
+    allocator.deallocate(array->data, allocator.state);
     array->data = NULL;
     array->size = 0;
     array->capacity = 0;
@@ -245,13 +370,14 @@ turtlesim__action__RotateAbsolute_Result__Sequence__fini(turtlesim__action__Rota
 turtlesim__action__RotateAbsolute_Result__Sequence *
 turtlesim__action__RotateAbsolute_Result__Sequence__create(size_t size)
 {
-  turtlesim__action__RotateAbsolute_Result__Sequence * array = (turtlesim__action__RotateAbsolute_Result__Sequence *)malloc(sizeof(turtlesim__action__RotateAbsolute_Result__Sequence));
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  turtlesim__action__RotateAbsolute_Result__Sequence * array = (turtlesim__action__RotateAbsolute_Result__Sequence *)allocator.allocate(sizeof(turtlesim__action__RotateAbsolute_Result__Sequence), allocator.state);
   if (!array) {
     return NULL;
   }
   bool success = turtlesim__action__RotateAbsolute_Result__Sequence__init(array, size);
   if (!success) {
-    free(array);
+    allocator.deallocate(array, allocator.state);
     return NULL;
   }
   return array;
@@ -260,10 +386,68 @@ turtlesim__action__RotateAbsolute_Result__Sequence__create(size_t size)
 void
 turtlesim__action__RotateAbsolute_Result__Sequence__destroy(turtlesim__action__RotateAbsolute_Result__Sequence * array)
 {
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   if (array) {
     turtlesim__action__RotateAbsolute_Result__Sequence__fini(array);
   }
-  free(array);
+  allocator.deallocate(array, allocator.state);
+}
+
+bool
+turtlesim__action__RotateAbsolute_Result__Sequence__are_equal(const turtlesim__action__RotateAbsolute_Result__Sequence * lhs, const turtlesim__action__RotateAbsolute_Result__Sequence * rhs)
+{
+  if (!lhs || !rhs) {
+    return false;
+  }
+  if (lhs->size != rhs->size) {
+    return false;
+  }
+  for (size_t i = 0; i < lhs->size; ++i) {
+    if (!turtlesim__action__RotateAbsolute_Result__are_equal(&(lhs->data[i]), &(rhs->data[i]))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool
+turtlesim__action__RotateAbsolute_Result__Sequence__copy(
+  const turtlesim__action__RotateAbsolute_Result__Sequence * input,
+  turtlesim__action__RotateAbsolute_Result__Sequence * output)
+{
+  if (!input || !output) {
+    return false;
+  }
+  if (output->capacity < input->size) {
+    const size_t allocation_size =
+      input->size * sizeof(turtlesim__action__RotateAbsolute_Result);
+    turtlesim__action__RotateAbsolute_Result * data =
+      (turtlesim__action__RotateAbsolute_Result *)realloc(output->data, allocation_size);
+    if (!data) {
+      return false;
+    }
+    for (size_t i = output->capacity; i < input->size; ++i) {
+      if (!turtlesim__action__RotateAbsolute_Result__init(&data[i])) {
+        /* free currently allocated and return false */
+        for (; i-- > output->capacity; ) {
+          turtlesim__action__RotateAbsolute_Result__fini(&data[i]);
+        }
+        free(data);
+        return false;
+      }
+    }
+    output->data = data;
+    output->capacity = input->size;
+  }
+  output->size = input->size;
+  for (size_t i = 0; i < input->size; ++i) {
+    if (!turtlesim__action__RotateAbsolute_Result__copy(
+        &(input->data[i]), &(output->data[i])))
+    {
+      return false;
+    }
+  }
+  return true;
 }
 
 
@@ -286,17 +470,44 @@ turtlesim__action__RotateAbsolute_Feedback__fini(turtlesim__action__RotateAbsolu
   // remaining
 }
 
+bool
+turtlesim__action__RotateAbsolute_Feedback__are_equal(const turtlesim__action__RotateAbsolute_Feedback * lhs, const turtlesim__action__RotateAbsolute_Feedback * rhs)
+{
+  if (!lhs || !rhs) {
+    return false;
+  }
+  // remaining
+  if (lhs->remaining != rhs->remaining) {
+    return false;
+  }
+  return true;
+}
+
+bool
+turtlesim__action__RotateAbsolute_Feedback__copy(
+  const turtlesim__action__RotateAbsolute_Feedback * input,
+  turtlesim__action__RotateAbsolute_Feedback * output)
+{
+  if (!input || !output) {
+    return false;
+  }
+  // remaining
+  output->remaining = input->remaining;
+  return true;
+}
+
 turtlesim__action__RotateAbsolute_Feedback *
 turtlesim__action__RotateAbsolute_Feedback__create()
 {
-  turtlesim__action__RotateAbsolute_Feedback * msg = (turtlesim__action__RotateAbsolute_Feedback *)malloc(sizeof(turtlesim__action__RotateAbsolute_Feedback));
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  turtlesim__action__RotateAbsolute_Feedback * msg = (turtlesim__action__RotateAbsolute_Feedback *)allocator.allocate(sizeof(turtlesim__action__RotateAbsolute_Feedback), allocator.state);
   if (!msg) {
     return NULL;
   }
   memset(msg, 0, sizeof(turtlesim__action__RotateAbsolute_Feedback));
   bool success = turtlesim__action__RotateAbsolute_Feedback__init(msg);
   if (!success) {
-    free(msg);
+    allocator.deallocate(msg, allocator.state);
     return NULL;
   }
   return msg;
@@ -305,10 +516,11 @@ turtlesim__action__RotateAbsolute_Feedback__create()
 void
 turtlesim__action__RotateAbsolute_Feedback__destroy(turtlesim__action__RotateAbsolute_Feedback * msg)
 {
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   if (msg) {
     turtlesim__action__RotateAbsolute_Feedback__fini(msg);
   }
-  free(msg);
+  allocator.deallocate(msg, allocator.state);
 }
 
 
@@ -318,9 +530,11 @@ turtlesim__action__RotateAbsolute_Feedback__Sequence__init(turtlesim__action__Ro
   if (!array) {
     return false;
   }
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   turtlesim__action__RotateAbsolute_Feedback * data = NULL;
+
   if (size) {
-    data = (turtlesim__action__RotateAbsolute_Feedback *)calloc(size, sizeof(turtlesim__action__RotateAbsolute_Feedback));
+    data = (turtlesim__action__RotateAbsolute_Feedback *)allocator.zero_allocate(size, sizeof(turtlesim__action__RotateAbsolute_Feedback), allocator.state);
     if (!data) {
       return false;
     }
@@ -337,7 +551,7 @@ turtlesim__action__RotateAbsolute_Feedback__Sequence__init(turtlesim__action__Ro
       for (; i > 0; --i) {
         turtlesim__action__RotateAbsolute_Feedback__fini(&data[i - 1]);
       }
-      free(data);
+      allocator.deallocate(data, allocator.state);
       return false;
     }
   }
@@ -353,6 +567,8 @@ turtlesim__action__RotateAbsolute_Feedback__Sequence__fini(turtlesim__action__Ro
   if (!array) {
     return;
   }
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+
   if (array->data) {
     // ensure that data and capacity values are consistent
     assert(array->capacity > 0);
@@ -360,7 +576,7 @@ turtlesim__action__RotateAbsolute_Feedback__Sequence__fini(turtlesim__action__Ro
     for (size_t i = 0; i < array->capacity; ++i) {
       turtlesim__action__RotateAbsolute_Feedback__fini(&array->data[i]);
     }
-    free(array->data);
+    allocator.deallocate(array->data, allocator.state);
     array->data = NULL;
     array->size = 0;
     array->capacity = 0;
@@ -374,13 +590,14 @@ turtlesim__action__RotateAbsolute_Feedback__Sequence__fini(turtlesim__action__Ro
 turtlesim__action__RotateAbsolute_Feedback__Sequence *
 turtlesim__action__RotateAbsolute_Feedback__Sequence__create(size_t size)
 {
-  turtlesim__action__RotateAbsolute_Feedback__Sequence * array = (turtlesim__action__RotateAbsolute_Feedback__Sequence *)malloc(sizeof(turtlesim__action__RotateAbsolute_Feedback__Sequence));
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  turtlesim__action__RotateAbsolute_Feedback__Sequence * array = (turtlesim__action__RotateAbsolute_Feedback__Sequence *)allocator.allocate(sizeof(turtlesim__action__RotateAbsolute_Feedback__Sequence), allocator.state);
   if (!array) {
     return NULL;
   }
   bool success = turtlesim__action__RotateAbsolute_Feedback__Sequence__init(array, size);
   if (!success) {
-    free(array);
+    allocator.deallocate(array, allocator.state);
     return NULL;
   }
   return array;
@@ -389,10 +606,68 @@ turtlesim__action__RotateAbsolute_Feedback__Sequence__create(size_t size)
 void
 turtlesim__action__RotateAbsolute_Feedback__Sequence__destroy(turtlesim__action__RotateAbsolute_Feedback__Sequence * array)
 {
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   if (array) {
     turtlesim__action__RotateAbsolute_Feedback__Sequence__fini(array);
   }
-  free(array);
+  allocator.deallocate(array, allocator.state);
+}
+
+bool
+turtlesim__action__RotateAbsolute_Feedback__Sequence__are_equal(const turtlesim__action__RotateAbsolute_Feedback__Sequence * lhs, const turtlesim__action__RotateAbsolute_Feedback__Sequence * rhs)
+{
+  if (!lhs || !rhs) {
+    return false;
+  }
+  if (lhs->size != rhs->size) {
+    return false;
+  }
+  for (size_t i = 0; i < lhs->size; ++i) {
+    if (!turtlesim__action__RotateAbsolute_Feedback__are_equal(&(lhs->data[i]), &(rhs->data[i]))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool
+turtlesim__action__RotateAbsolute_Feedback__Sequence__copy(
+  const turtlesim__action__RotateAbsolute_Feedback__Sequence * input,
+  turtlesim__action__RotateAbsolute_Feedback__Sequence * output)
+{
+  if (!input || !output) {
+    return false;
+  }
+  if (output->capacity < input->size) {
+    const size_t allocation_size =
+      input->size * sizeof(turtlesim__action__RotateAbsolute_Feedback);
+    turtlesim__action__RotateAbsolute_Feedback * data =
+      (turtlesim__action__RotateAbsolute_Feedback *)realloc(output->data, allocation_size);
+    if (!data) {
+      return false;
+    }
+    for (size_t i = output->capacity; i < input->size; ++i) {
+      if (!turtlesim__action__RotateAbsolute_Feedback__init(&data[i])) {
+        /* free currently allocated and return false */
+        for (; i-- > output->capacity; ) {
+          turtlesim__action__RotateAbsolute_Feedback__fini(&data[i]);
+        }
+        free(data);
+        return false;
+      }
+    }
+    output->data = data;
+    output->capacity = input->size;
+  }
+  output->size = input->size;
+  for (size_t i = 0; i < input->size; ++i) {
+    if (!turtlesim__action__RotateAbsolute_Feedback__copy(
+        &(input->data[i]), &(output->data[i])))
+    {
+      return false;
+    }
+  }
+  return true;
 }
 
 
@@ -434,17 +709,62 @@ turtlesim__action__RotateAbsolute_SendGoal_Request__fini(turtlesim__action__Rota
   turtlesim__action__RotateAbsolute_Goal__fini(&msg->goal);
 }
 
+bool
+turtlesim__action__RotateAbsolute_SendGoal_Request__are_equal(const turtlesim__action__RotateAbsolute_SendGoal_Request * lhs, const turtlesim__action__RotateAbsolute_SendGoal_Request * rhs)
+{
+  if (!lhs || !rhs) {
+    return false;
+  }
+  // goal_id
+  if (!unique_identifier_msgs__msg__UUID__are_equal(
+      &(lhs->goal_id), &(rhs->goal_id)))
+  {
+    return false;
+  }
+  // goal
+  if (!turtlesim__action__RotateAbsolute_Goal__are_equal(
+      &(lhs->goal), &(rhs->goal)))
+  {
+    return false;
+  }
+  return true;
+}
+
+bool
+turtlesim__action__RotateAbsolute_SendGoal_Request__copy(
+  const turtlesim__action__RotateAbsolute_SendGoal_Request * input,
+  turtlesim__action__RotateAbsolute_SendGoal_Request * output)
+{
+  if (!input || !output) {
+    return false;
+  }
+  // goal_id
+  if (!unique_identifier_msgs__msg__UUID__copy(
+      &(input->goal_id), &(output->goal_id)))
+  {
+    return false;
+  }
+  // goal
+  if (!turtlesim__action__RotateAbsolute_Goal__copy(
+      &(input->goal), &(output->goal)))
+  {
+    return false;
+  }
+  return true;
+}
+
 turtlesim__action__RotateAbsolute_SendGoal_Request *
 turtlesim__action__RotateAbsolute_SendGoal_Request__create()
 {
-  turtlesim__action__RotateAbsolute_SendGoal_Request * msg = (turtlesim__action__RotateAbsolute_SendGoal_Request *)malloc(sizeof(turtlesim__action__RotateAbsolute_SendGoal_Request));
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  turtlesim__action__RotateAbsolute_SendGoal_Request * msg = (turtlesim__action__RotateAbsolute_SendGoal_Request *)allocator.allocate(sizeof(turtlesim__action__RotateAbsolute_SendGoal_Request), allocator.state);
   if (!msg) {
     return NULL;
   }
   memset(msg, 0, sizeof(turtlesim__action__RotateAbsolute_SendGoal_Request));
   bool success = turtlesim__action__RotateAbsolute_SendGoal_Request__init(msg);
   if (!success) {
-    free(msg);
+    allocator.deallocate(msg, allocator.state);
     return NULL;
   }
   return msg;
@@ -453,10 +773,11 @@ turtlesim__action__RotateAbsolute_SendGoal_Request__create()
 void
 turtlesim__action__RotateAbsolute_SendGoal_Request__destroy(turtlesim__action__RotateAbsolute_SendGoal_Request * msg)
 {
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   if (msg) {
     turtlesim__action__RotateAbsolute_SendGoal_Request__fini(msg);
   }
-  free(msg);
+  allocator.deallocate(msg, allocator.state);
 }
 
 
@@ -466,9 +787,11 @@ turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence__init(turtlesim__ac
   if (!array) {
     return false;
   }
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   turtlesim__action__RotateAbsolute_SendGoal_Request * data = NULL;
+
   if (size) {
-    data = (turtlesim__action__RotateAbsolute_SendGoal_Request *)calloc(size, sizeof(turtlesim__action__RotateAbsolute_SendGoal_Request));
+    data = (turtlesim__action__RotateAbsolute_SendGoal_Request *)allocator.zero_allocate(size, sizeof(turtlesim__action__RotateAbsolute_SendGoal_Request), allocator.state);
     if (!data) {
       return false;
     }
@@ -485,7 +808,7 @@ turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence__init(turtlesim__ac
       for (; i > 0; --i) {
         turtlesim__action__RotateAbsolute_SendGoal_Request__fini(&data[i - 1]);
       }
-      free(data);
+      allocator.deallocate(data, allocator.state);
       return false;
     }
   }
@@ -501,6 +824,8 @@ turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence__fini(turtlesim__ac
   if (!array) {
     return;
   }
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+
   if (array->data) {
     // ensure that data and capacity values are consistent
     assert(array->capacity > 0);
@@ -508,7 +833,7 @@ turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence__fini(turtlesim__ac
     for (size_t i = 0; i < array->capacity; ++i) {
       turtlesim__action__RotateAbsolute_SendGoal_Request__fini(&array->data[i]);
     }
-    free(array->data);
+    allocator.deallocate(array->data, allocator.state);
     array->data = NULL;
     array->size = 0;
     array->capacity = 0;
@@ -522,13 +847,14 @@ turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence__fini(turtlesim__ac
 turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence *
 turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence__create(size_t size)
 {
-  turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence * array = (turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence *)malloc(sizeof(turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence));
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence * array = (turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence *)allocator.allocate(sizeof(turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence), allocator.state);
   if (!array) {
     return NULL;
   }
   bool success = turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence__init(array, size);
   if (!success) {
-    free(array);
+    allocator.deallocate(array, allocator.state);
     return NULL;
   }
   return array;
@@ -537,10 +863,68 @@ turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence__create(size_t size
 void
 turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence__destroy(turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence * array)
 {
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   if (array) {
     turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence__fini(array);
   }
-  free(array);
+  allocator.deallocate(array, allocator.state);
+}
+
+bool
+turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence__are_equal(const turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence * lhs, const turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence * rhs)
+{
+  if (!lhs || !rhs) {
+    return false;
+  }
+  if (lhs->size != rhs->size) {
+    return false;
+  }
+  for (size_t i = 0; i < lhs->size; ++i) {
+    if (!turtlesim__action__RotateAbsolute_SendGoal_Request__are_equal(&(lhs->data[i]), &(rhs->data[i]))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool
+turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence__copy(
+  const turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence * input,
+  turtlesim__action__RotateAbsolute_SendGoal_Request__Sequence * output)
+{
+  if (!input || !output) {
+    return false;
+  }
+  if (output->capacity < input->size) {
+    const size_t allocation_size =
+      input->size * sizeof(turtlesim__action__RotateAbsolute_SendGoal_Request);
+    turtlesim__action__RotateAbsolute_SendGoal_Request * data =
+      (turtlesim__action__RotateAbsolute_SendGoal_Request *)realloc(output->data, allocation_size);
+    if (!data) {
+      return false;
+    }
+    for (size_t i = output->capacity; i < input->size; ++i) {
+      if (!turtlesim__action__RotateAbsolute_SendGoal_Request__init(&data[i])) {
+        /* free currently allocated and return false */
+        for (; i-- > output->capacity; ) {
+          turtlesim__action__RotateAbsolute_SendGoal_Request__fini(&data[i]);
+        }
+        free(data);
+        return false;
+      }
+    }
+    output->data = data;
+    output->capacity = input->size;
+  }
+  output->size = input->size;
+  for (size_t i = 0; i < input->size; ++i) {
+    if (!turtlesim__action__RotateAbsolute_SendGoal_Request__copy(
+        &(input->data[i]), &(output->data[i])))
+    {
+      return false;
+    }
+  }
+  return true;
 }
 
 
@@ -574,17 +958,56 @@ turtlesim__action__RotateAbsolute_SendGoal_Response__fini(turtlesim__action__Rot
   builtin_interfaces__msg__Time__fini(&msg->stamp);
 }
 
+bool
+turtlesim__action__RotateAbsolute_SendGoal_Response__are_equal(const turtlesim__action__RotateAbsolute_SendGoal_Response * lhs, const turtlesim__action__RotateAbsolute_SendGoal_Response * rhs)
+{
+  if (!lhs || !rhs) {
+    return false;
+  }
+  // accepted
+  if (lhs->accepted != rhs->accepted) {
+    return false;
+  }
+  // stamp
+  if (!builtin_interfaces__msg__Time__are_equal(
+      &(lhs->stamp), &(rhs->stamp)))
+  {
+    return false;
+  }
+  return true;
+}
+
+bool
+turtlesim__action__RotateAbsolute_SendGoal_Response__copy(
+  const turtlesim__action__RotateAbsolute_SendGoal_Response * input,
+  turtlesim__action__RotateAbsolute_SendGoal_Response * output)
+{
+  if (!input || !output) {
+    return false;
+  }
+  // accepted
+  output->accepted = input->accepted;
+  // stamp
+  if (!builtin_interfaces__msg__Time__copy(
+      &(input->stamp), &(output->stamp)))
+  {
+    return false;
+  }
+  return true;
+}
+
 turtlesim__action__RotateAbsolute_SendGoal_Response *
 turtlesim__action__RotateAbsolute_SendGoal_Response__create()
 {
-  turtlesim__action__RotateAbsolute_SendGoal_Response * msg = (turtlesim__action__RotateAbsolute_SendGoal_Response *)malloc(sizeof(turtlesim__action__RotateAbsolute_SendGoal_Response));
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  turtlesim__action__RotateAbsolute_SendGoal_Response * msg = (turtlesim__action__RotateAbsolute_SendGoal_Response *)allocator.allocate(sizeof(turtlesim__action__RotateAbsolute_SendGoal_Response), allocator.state);
   if (!msg) {
     return NULL;
   }
   memset(msg, 0, sizeof(turtlesim__action__RotateAbsolute_SendGoal_Response));
   bool success = turtlesim__action__RotateAbsolute_SendGoal_Response__init(msg);
   if (!success) {
-    free(msg);
+    allocator.deallocate(msg, allocator.state);
     return NULL;
   }
   return msg;
@@ -593,10 +1016,11 @@ turtlesim__action__RotateAbsolute_SendGoal_Response__create()
 void
 turtlesim__action__RotateAbsolute_SendGoal_Response__destroy(turtlesim__action__RotateAbsolute_SendGoal_Response * msg)
 {
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   if (msg) {
     turtlesim__action__RotateAbsolute_SendGoal_Response__fini(msg);
   }
-  free(msg);
+  allocator.deallocate(msg, allocator.state);
 }
 
 
@@ -606,9 +1030,11 @@ turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence__init(turtlesim__a
   if (!array) {
     return false;
   }
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   turtlesim__action__RotateAbsolute_SendGoal_Response * data = NULL;
+
   if (size) {
-    data = (turtlesim__action__RotateAbsolute_SendGoal_Response *)calloc(size, sizeof(turtlesim__action__RotateAbsolute_SendGoal_Response));
+    data = (turtlesim__action__RotateAbsolute_SendGoal_Response *)allocator.zero_allocate(size, sizeof(turtlesim__action__RotateAbsolute_SendGoal_Response), allocator.state);
     if (!data) {
       return false;
     }
@@ -625,7 +1051,7 @@ turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence__init(turtlesim__a
       for (; i > 0; --i) {
         turtlesim__action__RotateAbsolute_SendGoal_Response__fini(&data[i - 1]);
       }
-      free(data);
+      allocator.deallocate(data, allocator.state);
       return false;
     }
   }
@@ -641,6 +1067,8 @@ turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence__fini(turtlesim__a
   if (!array) {
     return;
   }
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+
   if (array->data) {
     // ensure that data and capacity values are consistent
     assert(array->capacity > 0);
@@ -648,7 +1076,7 @@ turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence__fini(turtlesim__a
     for (size_t i = 0; i < array->capacity; ++i) {
       turtlesim__action__RotateAbsolute_SendGoal_Response__fini(&array->data[i]);
     }
-    free(array->data);
+    allocator.deallocate(array->data, allocator.state);
     array->data = NULL;
     array->size = 0;
     array->capacity = 0;
@@ -662,13 +1090,14 @@ turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence__fini(turtlesim__a
 turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence *
 turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence__create(size_t size)
 {
-  turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence * array = (turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence *)malloc(sizeof(turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence));
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence * array = (turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence *)allocator.allocate(sizeof(turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence), allocator.state);
   if (!array) {
     return NULL;
   }
   bool success = turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence__init(array, size);
   if (!success) {
-    free(array);
+    allocator.deallocate(array, allocator.state);
     return NULL;
   }
   return array;
@@ -677,10 +1106,68 @@ turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence__create(size_t siz
 void
 turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence__destroy(turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence * array)
 {
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   if (array) {
     turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence__fini(array);
   }
-  free(array);
+  allocator.deallocate(array, allocator.state);
+}
+
+bool
+turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence__are_equal(const turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence * lhs, const turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence * rhs)
+{
+  if (!lhs || !rhs) {
+    return false;
+  }
+  if (lhs->size != rhs->size) {
+    return false;
+  }
+  for (size_t i = 0; i < lhs->size; ++i) {
+    if (!turtlesim__action__RotateAbsolute_SendGoal_Response__are_equal(&(lhs->data[i]), &(rhs->data[i]))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool
+turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence__copy(
+  const turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence * input,
+  turtlesim__action__RotateAbsolute_SendGoal_Response__Sequence * output)
+{
+  if (!input || !output) {
+    return false;
+  }
+  if (output->capacity < input->size) {
+    const size_t allocation_size =
+      input->size * sizeof(turtlesim__action__RotateAbsolute_SendGoal_Response);
+    turtlesim__action__RotateAbsolute_SendGoal_Response * data =
+      (turtlesim__action__RotateAbsolute_SendGoal_Response *)realloc(output->data, allocation_size);
+    if (!data) {
+      return false;
+    }
+    for (size_t i = output->capacity; i < input->size; ++i) {
+      if (!turtlesim__action__RotateAbsolute_SendGoal_Response__init(&data[i])) {
+        /* free currently allocated and return false */
+        for (; i-- > output->capacity; ) {
+          turtlesim__action__RotateAbsolute_SendGoal_Response__fini(&data[i]);
+        }
+        free(data);
+        return false;
+      }
+    }
+    output->data = data;
+    output->capacity = input->size;
+  }
+  output->size = input->size;
+  for (size_t i = 0; i < input->size; ++i) {
+    if (!turtlesim__action__RotateAbsolute_SendGoal_Response__copy(
+        &(input->data[i]), &(output->data[i])))
+    {
+      return false;
+    }
+  }
+  return true;
 }
 
 
@@ -713,17 +1200,50 @@ turtlesim__action__RotateAbsolute_GetResult_Request__fini(turtlesim__action__Rot
   unique_identifier_msgs__msg__UUID__fini(&msg->goal_id);
 }
 
+bool
+turtlesim__action__RotateAbsolute_GetResult_Request__are_equal(const turtlesim__action__RotateAbsolute_GetResult_Request * lhs, const turtlesim__action__RotateAbsolute_GetResult_Request * rhs)
+{
+  if (!lhs || !rhs) {
+    return false;
+  }
+  // goal_id
+  if (!unique_identifier_msgs__msg__UUID__are_equal(
+      &(lhs->goal_id), &(rhs->goal_id)))
+  {
+    return false;
+  }
+  return true;
+}
+
+bool
+turtlesim__action__RotateAbsolute_GetResult_Request__copy(
+  const turtlesim__action__RotateAbsolute_GetResult_Request * input,
+  turtlesim__action__RotateAbsolute_GetResult_Request * output)
+{
+  if (!input || !output) {
+    return false;
+  }
+  // goal_id
+  if (!unique_identifier_msgs__msg__UUID__copy(
+      &(input->goal_id), &(output->goal_id)))
+  {
+    return false;
+  }
+  return true;
+}
+
 turtlesim__action__RotateAbsolute_GetResult_Request *
 turtlesim__action__RotateAbsolute_GetResult_Request__create()
 {
-  turtlesim__action__RotateAbsolute_GetResult_Request * msg = (turtlesim__action__RotateAbsolute_GetResult_Request *)malloc(sizeof(turtlesim__action__RotateAbsolute_GetResult_Request));
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  turtlesim__action__RotateAbsolute_GetResult_Request * msg = (turtlesim__action__RotateAbsolute_GetResult_Request *)allocator.allocate(sizeof(turtlesim__action__RotateAbsolute_GetResult_Request), allocator.state);
   if (!msg) {
     return NULL;
   }
   memset(msg, 0, sizeof(turtlesim__action__RotateAbsolute_GetResult_Request));
   bool success = turtlesim__action__RotateAbsolute_GetResult_Request__init(msg);
   if (!success) {
-    free(msg);
+    allocator.deallocate(msg, allocator.state);
     return NULL;
   }
   return msg;
@@ -732,10 +1252,11 @@ turtlesim__action__RotateAbsolute_GetResult_Request__create()
 void
 turtlesim__action__RotateAbsolute_GetResult_Request__destroy(turtlesim__action__RotateAbsolute_GetResult_Request * msg)
 {
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   if (msg) {
     turtlesim__action__RotateAbsolute_GetResult_Request__fini(msg);
   }
-  free(msg);
+  allocator.deallocate(msg, allocator.state);
 }
 
 
@@ -745,9 +1266,11 @@ turtlesim__action__RotateAbsolute_GetResult_Request__Sequence__init(turtlesim__a
   if (!array) {
     return false;
   }
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   turtlesim__action__RotateAbsolute_GetResult_Request * data = NULL;
+
   if (size) {
-    data = (turtlesim__action__RotateAbsolute_GetResult_Request *)calloc(size, sizeof(turtlesim__action__RotateAbsolute_GetResult_Request));
+    data = (turtlesim__action__RotateAbsolute_GetResult_Request *)allocator.zero_allocate(size, sizeof(turtlesim__action__RotateAbsolute_GetResult_Request), allocator.state);
     if (!data) {
       return false;
     }
@@ -764,7 +1287,7 @@ turtlesim__action__RotateAbsolute_GetResult_Request__Sequence__init(turtlesim__a
       for (; i > 0; --i) {
         turtlesim__action__RotateAbsolute_GetResult_Request__fini(&data[i - 1]);
       }
-      free(data);
+      allocator.deallocate(data, allocator.state);
       return false;
     }
   }
@@ -780,6 +1303,8 @@ turtlesim__action__RotateAbsolute_GetResult_Request__Sequence__fini(turtlesim__a
   if (!array) {
     return;
   }
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+
   if (array->data) {
     // ensure that data and capacity values are consistent
     assert(array->capacity > 0);
@@ -787,7 +1312,7 @@ turtlesim__action__RotateAbsolute_GetResult_Request__Sequence__fini(turtlesim__a
     for (size_t i = 0; i < array->capacity; ++i) {
       turtlesim__action__RotateAbsolute_GetResult_Request__fini(&array->data[i]);
     }
-    free(array->data);
+    allocator.deallocate(array->data, allocator.state);
     array->data = NULL;
     array->size = 0;
     array->capacity = 0;
@@ -801,13 +1326,14 @@ turtlesim__action__RotateAbsolute_GetResult_Request__Sequence__fini(turtlesim__a
 turtlesim__action__RotateAbsolute_GetResult_Request__Sequence *
 turtlesim__action__RotateAbsolute_GetResult_Request__Sequence__create(size_t size)
 {
-  turtlesim__action__RotateAbsolute_GetResult_Request__Sequence * array = (turtlesim__action__RotateAbsolute_GetResult_Request__Sequence *)malloc(sizeof(turtlesim__action__RotateAbsolute_GetResult_Request__Sequence));
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  turtlesim__action__RotateAbsolute_GetResult_Request__Sequence * array = (turtlesim__action__RotateAbsolute_GetResult_Request__Sequence *)allocator.allocate(sizeof(turtlesim__action__RotateAbsolute_GetResult_Request__Sequence), allocator.state);
   if (!array) {
     return NULL;
   }
   bool success = turtlesim__action__RotateAbsolute_GetResult_Request__Sequence__init(array, size);
   if (!success) {
-    free(array);
+    allocator.deallocate(array, allocator.state);
     return NULL;
   }
   return array;
@@ -816,10 +1342,68 @@ turtlesim__action__RotateAbsolute_GetResult_Request__Sequence__create(size_t siz
 void
 turtlesim__action__RotateAbsolute_GetResult_Request__Sequence__destroy(turtlesim__action__RotateAbsolute_GetResult_Request__Sequence * array)
 {
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   if (array) {
     turtlesim__action__RotateAbsolute_GetResult_Request__Sequence__fini(array);
   }
-  free(array);
+  allocator.deallocate(array, allocator.state);
+}
+
+bool
+turtlesim__action__RotateAbsolute_GetResult_Request__Sequence__are_equal(const turtlesim__action__RotateAbsolute_GetResult_Request__Sequence * lhs, const turtlesim__action__RotateAbsolute_GetResult_Request__Sequence * rhs)
+{
+  if (!lhs || !rhs) {
+    return false;
+  }
+  if (lhs->size != rhs->size) {
+    return false;
+  }
+  for (size_t i = 0; i < lhs->size; ++i) {
+    if (!turtlesim__action__RotateAbsolute_GetResult_Request__are_equal(&(lhs->data[i]), &(rhs->data[i]))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool
+turtlesim__action__RotateAbsolute_GetResult_Request__Sequence__copy(
+  const turtlesim__action__RotateAbsolute_GetResult_Request__Sequence * input,
+  turtlesim__action__RotateAbsolute_GetResult_Request__Sequence * output)
+{
+  if (!input || !output) {
+    return false;
+  }
+  if (output->capacity < input->size) {
+    const size_t allocation_size =
+      input->size * sizeof(turtlesim__action__RotateAbsolute_GetResult_Request);
+    turtlesim__action__RotateAbsolute_GetResult_Request * data =
+      (turtlesim__action__RotateAbsolute_GetResult_Request *)realloc(output->data, allocation_size);
+    if (!data) {
+      return false;
+    }
+    for (size_t i = output->capacity; i < input->size; ++i) {
+      if (!turtlesim__action__RotateAbsolute_GetResult_Request__init(&data[i])) {
+        /* free currently allocated and return false */
+        for (; i-- > output->capacity; ) {
+          turtlesim__action__RotateAbsolute_GetResult_Request__fini(&data[i]);
+        }
+        free(data);
+        return false;
+      }
+    }
+    output->data = data;
+    output->capacity = input->size;
+  }
+  output->size = input->size;
+  for (size_t i = 0; i < input->size; ++i) {
+    if (!turtlesim__action__RotateAbsolute_GetResult_Request__copy(
+        &(input->data[i]), &(output->data[i])))
+    {
+      return false;
+    }
+  }
+  return true;
 }
 
 
@@ -854,17 +1438,56 @@ turtlesim__action__RotateAbsolute_GetResult_Response__fini(turtlesim__action__Ro
   turtlesim__action__RotateAbsolute_Result__fini(&msg->result);
 }
 
+bool
+turtlesim__action__RotateAbsolute_GetResult_Response__are_equal(const turtlesim__action__RotateAbsolute_GetResult_Response * lhs, const turtlesim__action__RotateAbsolute_GetResult_Response * rhs)
+{
+  if (!lhs || !rhs) {
+    return false;
+  }
+  // status
+  if (lhs->status != rhs->status) {
+    return false;
+  }
+  // result
+  if (!turtlesim__action__RotateAbsolute_Result__are_equal(
+      &(lhs->result), &(rhs->result)))
+  {
+    return false;
+  }
+  return true;
+}
+
+bool
+turtlesim__action__RotateAbsolute_GetResult_Response__copy(
+  const turtlesim__action__RotateAbsolute_GetResult_Response * input,
+  turtlesim__action__RotateAbsolute_GetResult_Response * output)
+{
+  if (!input || !output) {
+    return false;
+  }
+  // status
+  output->status = input->status;
+  // result
+  if (!turtlesim__action__RotateAbsolute_Result__copy(
+      &(input->result), &(output->result)))
+  {
+    return false;
+  }
+  return true;
+}
+
 turtlesim__action__RotateAbsolute_GetResult_Response *
 turtlesim__action__RotateAbsolute_GetResult_Response__create()
 {
-  turtlesim__action__RotateAbsolute_GetResult_Response * msg = (turtlesim__action__RotateAbsolute_GetResult_Response *)malloc(sizeof(turtlesim__action__RotateAbsolute_GetResult_Response));
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  turtlesim__action__RotateAbsolute_GetResult_Response * msg = (turtlesim__action__RotateAbsolute_GetResult_Response *)allocator.allocate(sizeof(turtlesim__action__RotateAbsolute_GetResult_Response), allocator.state);
   if (!msg) {
     return NULL;
   }
   memset(msg, 0, sizeof(turtlesim__action__RotateAbsolute_GetResult_Response));
   bool success = turtlesim__action__RotateAbsolute_GetResult_Response__init(msg);
   if (!success) {
-    free(msg);
+    allocator.deallocate(msg, allocator.state);
     return NULL;
   }
   return msg;
@@ -873,10 +1496,11 @@ turtlesim__action__RotateAbsolute_GetResult_Response__create()
 void
 turtlesim__action__RotateAbsolute_GetResult_Response__destroy(turtlesim__action__RotateAbsolute_GetResult_Response * msg)
 {
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   if (msg) {
     turtlesim__action__RotateAbsolute_GetResult_Response__fini(msg);
   }
-  free(msg);
+  allocator.deallocate(msg, allocator.state);
 }
 
 
@@ -886,9 +1510,11 @@ turtlesim__action__RotateAbsolute_GetResult_Response__Sequence__init(turtlesim__
   if (!array) {
     return false;
   }
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   turtlesim__action__RotateAbsolute_GetResult_Response * data = NULL;
+
   if (size) {
-    data = (turtlesim__action__RotateAbsolute_GetResult_Response *)calloc(size, sizeof(turtlesim__action__RotateAbsolute_GetResult_Response));
+    data = (turtlesim__action__RotateAbsolute_GetResult_Response *)allocator.zero_allocate(size, sizeof(turtlesim__action__RotateAbsolute_GetResult_Response), allocator.state);
     if (!data) {
       return false;
     }
@@ -905,7 +1531,7 @@ turtlesim__action__RotateAbsolute_GetResult_Response__Sequence__init(turtlesim__
       for (; i > 0; --i) {
         turtlesim__action__RotateAbsolute_GetResult_Response__fini(&data[i - 1]);
       }
-      free(data);
+      allocator.deallocate(data, allocator.state);
       return false;
     }
   }
@@ -921,6 +1547,8 @@ turtlesim__action__RotateAbsolute_GetResult_Response__Sequence__fini(turtlesim__
   if (!array) {
     return;
   }
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+
   if (array->data) {
     // ensure that data and capacity values are consistent
     assert(array->capacity > 0);
@@ -928,7 +1556,7 @@ turtlesim__action__RotateAbsolute_GetResult_Response__Sequence__fini(turtlesim__
     for (size_t i = 0; i < array->capacity; ++i) {
       turtlesim__action__RotateAbsolute_GetResult_Response__fini(&array->data[i]);
     }
-    free(array->data);
+    allocator.deallocate(array->data, allocator.state);
     array->data = NULL;
     array->size = 0;
     array->capacity = 0;
@@ -942,13 +1570,14 @@ turtlesim__action__RotateAbsolute_GetResult_Response__Sequence__fini(turtlesim__
 turtlesim__action__RotateAbsolute_GetResult_Response__Sequence *
 turtlesim__action__RotateAbsolute_GetResult_Response__Sequence__create(size_t size)
 {
-  turtlesim__action__RotateAbsolute_GetResult_Response__Sequence * array = (turtlesim__action__RotateAbsolute_GetResult_Response__Sequence *)malloc(sizeof(turtlesim__action__RotateAbsolute_GetResult_Response__Sequence));
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  turtlesim__action__RotateAbsolute_GetResult_Response__Sequence * array = (turtlesim__action__RotateAbsolute_GetResult_Response__Sequence *)allocator.allocate(sizeof(turtlesim__action__RotateAbsolute_GetResult_Response__Sequence), allocator.state);
   if (!array) {
     return NULL;
   }
   bool success = turtlesim__action__RotateAbsolute_GetResult_Response__Sequence__init(array, size);
   if (!success) {
-    free(array);
+    allocator.deallocate(array, allocator.state);
     return NULL;
   }
   return array;
@@ -957,10 +1586,68 @@ turtlesim__action__RotateAbsolute_GetResult_Response__Sequence__create(size_t si
 void
 turtlesim__action__RotateAbsolute_GetResult_Response__Sequence__destroy(turtlesim__action__RotateAbsolute_GetResult_Response__Sequence * array)
 {
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   if (array) {
     turtlesim__action__RotateAbsolute_GetResult_Response__Sequence__fini(array);
   }
-  free(array);
+  allocator.deallocate(array, allocator.state);
+}
+
+bool
+turtlesim__action__RotateAbsolute_GetResult_Response__Sequence__are_equal(const turtlesim__action__RotateAbsolute_GetResult_Response__Sequence * lhs, const turtlesim__action__RotateAbsolute_GetResult_Response__Sequence * rhs)
+{
+  if (!lhs || !rhs) {
+    return false;
+  }
+  if (lhs->size != rhs->size) {
+    return false;
+  }
+  for (size_t i = 0; i < lhs->size; ++i) {
+    if (!turtlesim__action__RotateAbsolute_GetResult_Response__are_equal(&(lhs->data[i]), &(rhs->data[i]))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool
+turtlesim__action__RotateAbsolute_GetResult_Response__Sequence__copy(
+  const turtlesim__action__RotateAbsolute_GetResult_Response__Sequence * input,
+  turtlesim__action__RotateAbsolute_GetResult_Response__Sequence * output)
+{
+  if (!input || !output) {
+    return false;
+  }
+  if (output->capacity < input->size) {
+    const size_t allocation_size =
+      input->size * sizeof(turtlesim__action__RotateAbsolute_GetResult_Response);
+    turtlesim__action__RotateAbsolute_GetResult_Response * data =
+      (turtlesim__action__RotateAbsolute_GetResult_Response *)realloc(output->data, allocation_size);
+    if (!data) {
+      return false;
+    }
+    for (size_t i = output->capacity; i < input->size; ++i) {
+      if (!turtlesim__action__RotateAbsolute_GetResult_Response__init(&data[i])) {
+        /* free currently allocated and return false */
+        for (; i-- > output->capacity; ) {
+          turtlesim__action__RotateAbsolute_GetResult_Response__fini(&data[i]);
+        }
+        free(data);
+        return false;
+      }
+    }
+    output->data = data;
+    output->capacity = input->size;
+  }
+  output->size = input->size;
+  for (size_t i = 0; i < input->size; ++i) {
+    if (!turtlesim__action__RotateAbsolute_GetResult_Response__copy(
+        &(input->data[i]), &(output->data[i])))
+    {
+      return false;
+    }
+  }
+  return true;
 }
 
 
@@ -1003,17 +1690,62 @@ turtlesim__action__RotateAbsolute_FeedbackMessage__fini(turtlesim__action__Rotat
   turtlesim__action__RotateAbsolute_Feedback__fini(&msg->feedback);
 }
 
+bool
+turtlesim__action__RotateAbsolute_FeedbackMessage__are_equal(const turtlesim__action__RotateAbsolute_FeedbackMessage * lhs, const turtlesim__action__RotateAbsolute_FeedbackMessage * rhs)
+{
+  if (!lhs || !rhs) {
+    return false;
+  }
+  // goal_id
+  if (!unique_identifier_msgs__msg__UUID__are_equal(
+      &(lhs->goal_id), &(rhs->goal_id)))
+  {
+    return false;
+  }
+  // feedback
+  if (!turtlesim__action__RotateAbsolute_Feedback__are_equal(
+      &(lhs->feedback), &(rhs->feedback)))
+  {
+    return false;
+  }
+  return true;
+}
+
+bool
+turtlesim__action__RotateAbsolute_FeedbackMessage__copy(
+  const turtlesim__action__RotateAbsolute_FeedbackMessage * input,
+  turtlesim__action__RotateAbsolute_FeedbackMessage * output)
+{
+  if (!input || !output) {
+    return false;
+  }
+  // goal_id
+  if (!unique_identifier_msgs__msg__UUID__copy(
+      &(input->goal_id), &(output->goal_id)))
+  {
+    return false;
+  }
+  // feedback
+  if (!turtlesim__action__RotateAbsolute_Feedback__copy(
+      &(input->feedback), &(output->feedback)))
+  {
+    return false;
+  }
+  return true;
+}
+
 turtlesim__action__RotateAbsolute_FeedbackMessage *
 turtlesim__action__RotateAbsolute_FeedbackMessage__create()
 {
-  turtlesim__action__RotateAbsolute_FeedbackMessage * msg = (turtlesim__action__RotateAbsolute_FeedbackMessage *)malloc(sizeof(turtlesim__action__RotateAbsolute_FeedbackMessage));
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  turtlesim__action__RotateAbsolute_FeedbackMessage * msg = (turtlesim__action__RotateAbsolute_FeedbackMessage *)allocator.allocate(sizeof(turtlesim__action__RotateAbsolute_FeedbackMessage), allocator.state);
   if (!msg) {
     return NULL;
   }
   memset(msg, 0, sizeof(turtlesim__action__RotateAbsolute_FeedbackMessage));
   bool success = turtlesim__action__RotateAbsolute_FeedbackMessage__init(msg);
   if (!success) {
-    free(msg);
+    allocator.deallocate(msg, allocator.state);
     return NULL;
   }
   return msg;
@@ -1022,10 +1754,11 @@ turtlesim__action__RotateAbsolute_FeedbackMessage__create()
 void
 turtlesim__action__RotateAbsolute_FeedbackMessage__destroy(turtlesim__action__RotateAbsolute_FeedbackMessage * msg)
 {
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   if (msg) {
     turtlesim__action__RotateAbsolute_FeedbackMessage__fini(msg);
   }
-  free(msg);
+  allocator.deallocate(msg, allocator.state);
 }
 
 
@@ -1035,9 +1768,11 @@ turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence__init(turtlesim__act
   if (!array) {
     return false;
   }
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   turtlesim__action__RotateAbsolute_FeedbackMessage * data = NULL;
+
   if (size) {
-    data = (turtlesim__action__RotateAbsolute_FeedbackMessage *)calloc(size, sizeof(turtlesim__action__RotateAbsolute_FeedbackMessage));
+    data = (turtlesim__action__RotateAbsolute_FeedbackMessage *)allocator.zero_allocate(size, sizeof(turtlesim__action__RotateAbsolute_FeedbackMessage), allocator.state);
     if (!data) {
       return false;
     }
@@ -1054,7 +1789,7 @@ turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence__init(turtlesim__act
       for (; i > 0; --i) {
         turtlesim__action__RotateAbsolute_FeedbackMessage__fini(&data[i - 1]);
       }
-      free(data);
+      allocator.deallocate(data, allocator.state);
       return false;
     }
   }
@@ -1070,6 +1805,8 @@ turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence__fini(turtlesim__act
   if (!array) {
     return;
   }
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+
   if (array->data) {
     // ensure that data and capacity values are consistent
     assert(array->capacity > 0);
@@ -1077,7 +1814,7 @@ turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence__fini(turtlesim__act
     for (size_t i = 0; i < array->capacity; ++i) {
       turtlesim__action__RotateAbsolute_FeedbackMessage__fini(&array->data[i]);
     }
-    free(array->data);
+    allocator.deallocate(array->data, allocator.state);
     array->data = NULL;
     array->size = 0;
     array->capacity = 0;
@@ -1091,13 +1828,14 @@ turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence__fini(turtlesim__act
 turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence *
 turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence__create(size_t size)
 {
-  turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence * array = (turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence *)malloc(sizeof(turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence));
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence * array = (turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence *)allocator.allocate(sizeof(turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence), allocator.state);
   if (!array) {
     return NULL;
   }
   bool success = turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence__init(array, size);
   if (!success) {
-    free(array);
+    allocator.deallocate(array, allocator.state);
     return NULL;
   }
   return array;
@@ -1106,8 +1844,66 @@ turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence__create(size_t size)
 void
 turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence__destroy(turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence * array)
 {
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   if (array) {
     turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence__fini(array);
   }
-  free(array);
+  allocator.deallocate(array, allocator.state);
+}
+
+bool
+turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence__are_equal(const turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence * lhs, const turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence * rhs)
+{
+  if (!lhs || !rhs) {
+    return false;
+  }
+  if (lhs->size != rhs->size) {
+    return false;
+  }
+  for (size_t i = 0; i < lhs->size; ++i) {
+    if (!turtlesim__action__RotateAbsolute_FeedbackMessage__are_equal(&(lhs->data[i]), &(rhs->data[i]))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool
+turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence__copy(
+  const turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence * input,
+  turtlesim__action__RotateAbsolute_FeedbackMessage__Sequence * output)
+{
+  if (!input || !output) {
+    return false;
+  }
+  if (output->capacity < input->size) {
+    const size_t allocation_size =
+      input->size * sizeof(turtlesim__action__RotateAbsolute_FeedbackMessage);
+    turtlesim__action__RotateAbsolute_FeedbackMessage * data =
+      (turtlesim__action__RotateAbsolute_FeedbackMessage *)realloc(output->data, allocation_size);
+    if (!data) {
+      return false;
+    }
+    for (size_t i = output->capacity; i < input->size; ++i) {
+      if (!turtlesim__action__RotateAbsolute_FeedbackMessage__init(&data[i])) {
+        /* free currently allocated and return false */
+        for (; i-- > output->capacity; ) {
+          turtlesim__action__RotateAbsolute_FeedbackMessage__fini(&data[i]);
+        }
+        free(data);
+        return false;
+      }
+    }
+    output->data = data;
+    output->capacity = input->size;
+  }
+  output->size = input->size;
+  for (size_t i = 0; i < input->size; ++i) {
+    if (!turtlesim__action__RotateAbsolute_FeedbackMessage__copy(
+        &(input->data[i]), &(output->data[i])))
+    {
+      return false;
+    }
+  }
+  return true;
 }

@@ -26,6 +26,8 @@ TAGS
 build/
 bestmodels/
 mboutput/
+build/
+install/
 checkpoint/
 checkpoints/
 develop-eggs/
@@ -35,6 +37,7 @@ sampleset1/
 sampleset/
 sampleset2/
 simulations/
+simulation/
 downloads/
 calibration_images/
 eggs/

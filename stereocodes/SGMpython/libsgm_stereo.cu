@@ -143,7 +143,7 @@ py::array_t<int16_t>  Algo_libsgm::getDisparity_gpu(py::array_t<uint8_t>& Xleft,
 	// auto wls = cv::ximgproc::DisparityWLSFilter();
 	
 	wls_filter->filter(disparity_gpu,left,filtered_disp);
-	disparity_gpu=filtered_disp;
+	// disparity_gpu=filtered_disp;
 
   size_t rows = disparity_gpu.rows;
 	size_t cols = disparity_gpu.cols;

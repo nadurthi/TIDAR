@@ -193,11 +193,11 @@ if __name__=="__main__":
             if saveonclick and lastkey == 115:
                 q.put((images,CC))
                 print("saved: ",datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
-            if np.all(RET) and (prev_img_points is None or np.max(np.linalg.norm(prev_img_points-CC[0],axis=1))>100) and (tf-t0)>2:
-                prev_img_points = CC[0]
-                t0=time.time()
-                q.put((images, CC))
-                print("saved: ", datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
+            # if np.all(RET) and (prev_img_points is None or np.max(np.linalg.norm(prev_img_points-CC[0],axis=1))>100) and (tf-t0)>2:
+            #     prev_img_points = CC[0]
+            #     t0=time.time()
+            #     q.put((images, CC))
+            #     print("saved: ", datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
 
         mTis.stop_cameras()
 
@@ -222,7 +222,8 @@ if __name__=="__main__":
                     ff = '%05d_%02d.png' % (si, cj)
                     Limg_o = cv2.imread(os.path.join(savefolder, saveset, ff))
                     # ret, cor = cv2.findCirclesGrid(Limg_o, (4, 11), cv2.CALIB_CB_ASYMMETRIC_GRID, blobDetector, None)
-                    retL,cor=calib_codes.getchesspattern(Limg_o)
+                    grayimg = cv2.cvtColor(Limg_o, cv2.COLOR_BGR2GRAY)
+                    ret,cor=calib_codes.getchesspattern(grayimg)
                     if ret:
                         imgpoints[cj][si]=cor
         else:

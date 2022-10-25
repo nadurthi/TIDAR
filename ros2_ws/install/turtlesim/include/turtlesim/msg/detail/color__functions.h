@@ -66,6 +66,32 @@ ROSIDL_GENERATOR_C_PUBLIC_turtlesim
 void
 turtlesim__msg__Color__destroy(turtlesim__msg__Color * msg);
 
+/// Check for msg/Color message equality.
+/**
+ * \param[in] lhs The message on the left hand size of the equality operator.
+ * \param[in] rhs The message on the right hand size of the equality operator.
+ * \return true if messages are equal, otherwise false.
+ */
+ROSIDL_GENERATOR_C_PUBLIC_turtlesim
+bool
+turtlesim__msg__Color__are_equal(const turtlesim__msg__Color * lhs, const turtlesim__msg__Color * rhs);
+
+/// Copy a msg/Color message.
+/**
+ * This functions performs a deep copy, as opposed to the shallow copy that
+ * plain assignment yields.
+ *
+ * \param[in] input The source message pointer.
+ * \param[out] output The target message pointer, which must
+ *   have been initialized before calling this function.
+ * \return true if successful, or false if either pointer is null
+ *   or memory allocation fails.
+ */
+ROSIDL_GENERATOR_C_PUBLIC_turtlesim
+bool
+turtlesim__msg__Color__copy(
+  const turtlesim__msg__Color * input,
+  turtlesim__msg__Color * output);
 
 /// Initialize array of msg/Color messages.
 /**
@@ -116,6 +142,33 @@ turtlesim__msg__Color__Sequence__create(size_t size);
 ROSIDL_GENERATOR_C_PUBLIC_turtlesim
 void
 turtlesim__msg__Color__Sequence__destroy(turtlesim__msg__Color__Sequence * array);
+
+/// Check for msg/Color message array equality.
+/**
+ * \param[in] lhs The message array on the left hand size of the equality operator.
+ * \param[in] rhs The message array on the right hand size of the equality operator.
+ * \return true if message arrays are equal in size and content, otherwise false.
+ */
+ROSIDL_GENERATOR_C_PUBLIC_turtlesim
+bool
+turtlesim__msg__Color__Sequence__are_equal(const turtlesim__msg__Color__Sequence * lhs, const turtlesim__msg__Color__Sequence * rhs);
+
+/// Copy an array of msg/Color messages.
+/**
+ * This functions performs a deep copy, as opposed to the shallow copy that
+ * plain assignment yields.
+ *
+ * \param[in] input The source array pointer.
+ * \param[out] output The target array pointer, which must
+ *   have been initialized before calling this function.
+ * \return true if successful, or false if either pointer
+ *   is null or memory allocation fails.
+ */
+ROSIDL_GENERATOR_C_PUBLIC_turtlesim
+bool
+turtlesim__msg__Color__Sequence__copy(
+  const turtlesim__msg__Color__Sequence * input,
+  turtlesim__msg__Color__Sequence * output);
 
 #ifdef __cplusplus
 }

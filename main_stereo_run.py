@@ -40,7 +40,7 @@ import stereocodes.SGMpython.gpu_library  as gpu_library
 
 c1=0
 c2=2
-scale=3
+scale=1
 
 
 #%% testing calibrated stereo projection
@@ -86,9 +86,9 @@ mTis.start_cameras()
 
 #%% configure target detection
 
-# yolomodel = torch.hub.load('ultralytics/yolov5', 'yolov5m', pretrained=True)
-# yolomodel.cuda()
-# yolomodel.eval()
+yolomodel = torch.hub.load('ultralytics/yolov5', 'yolov5m', pretrained=True)
+yolomodel.cuda()
+yolomodel.eval()
 
 
 #%% run simulation
@@ -168,9 +168,9 @@ while 1:
     print("gray conversion = ",et-st)
 
     # deep
-    # st = time.time()
-    # disp = getmodel.runmodel(hsmmodel, Ldst.astype('float32'), Rdst.astype('float32'))
-    # et=time.time()
+    st = time.time()
+    disp = getmodel.runmodel(hsmmodel, Ldst.astype('float32'), Rdst.astype('float32'))
+    et=time.time()
 
 
 
@@ -179,44 +179,46 @@ while 1:
     # disp=disp/16
     # disp[disp<=0]=0
 
-    st=time.time()
-    disp = sps.libsgm.getDisparity_gpu(Ldstgray,Rdstgray)
-    et=time.time()
-    print("libsgm time = ",et-st)
+    # st=time.time()
+    # disp = sps.libsgm.getDisparity_gpu(Ldstgray,Rdstgray)
+    # et=time.time()
+    # print("libsgm time = ",et-st)
 
     Q = calib_parameters[scale]['stereo_rect'][(c1, c2)][4]
     depths, depthcolor, pcd = get_colored_depth(Ldst, disp, Q, dmax=100, returnpcd=False)
 
 
     #% target detection---------------------------------
-    # st=time.time()
-    # predictions = yolomodel([cv2.resize(Ldst, None,fx=0.5, fy=0.5,interpolation = cv2.INTER_AREA) ])
-    # preds = []
-    # for dd in predictions.pandas().xyxy:
-    #     b={'boxes': 2*dd[['xmin', 'ymin', 'xmax', 'ymax']].values.astype(int),
-    #                         'scores': dd['confidence'].values.astype(np.float32),
-    #                         'labels': dd['name'].values}
-    #     preds.append(b)
-    # 
-    # torch.cuda.empty_cache()
-    # 
-    # 
-    # for j in range(len(preds)):
-    #     if j>0:
-    #         break
-    #     boxes_f = preds[j]['boxes']
-    #     labels_f = preds[j]['labels']
-    #     scores_f = preds[j]['scores']
-    #     for i in range(len(boxes_f)):
-    #         d = depths[boxes_f[i][1]:boxes_f[i][3],boxes_f[i][0]:boxes_f[i][2]].reshape(-1)
-    #         if len(d)==0:
-    #             d=[np.inf]
-    #         else:
-    #             d=np.round(d[np.isfinite(d)],2)
-    #         cv2.rectangle(Ldst,(boxes_f[i][0],boxes_f[i][1]),(boxes_f[i][2],boxes_f[i][3]),(0,255,0),2)
-    #         cv2.putText(Ldst,str(labels_f[i])+" : "+str(scores_f[i])+" || {0:.2f},{0:.2f},{0:.2f}".format(np.min(d),np.mean(d),np.max(d)),(boxes_f[i][0],boxes_f[i][1]-10),0,1,(0,255,0),2)
-    # et = time.time()
-    # print("yolo time = ",et-st)
+    st=time.time()
+    predictions = yolomodel([cv2.resize(Ldst, None,fx=0.5, fy=0.5,interpolation = cv2.INTER_AREA) ])
+    preds = []
+    for dd in predictions.pandas().xyxy:
+        b={'boxes': 2*dd[['xmin', 'ymin', 'xmax', 'ymax']].values.astype(int),
+                            'scores': dd['confidence'].values.astype(np.float32),
+                            'labels': dd['name'].values}
+        preds.append(b)
+
+    torch.cuda.empty_cache()
+
+    try:
+        for j in range(len(preds)):
+            if j>0:
+                break
+            boxes_f = preds[j]['boxes']
+            labels_f = preds[j]['labels']
+            scores_f = preds[j]['scores']
+            for i in range(len(boxes_f)):
+                d = depths[boxes_f[i][1]:boxes_f[i][3],boxes_f[i][0]:boxes_f[i][2]].reshape(-1)
+                if len(d)==0:
+                    d=[np.inf]
+                else:
+                    d=np.round(d[np.isfinite(d)],2)
+                cv2.rectangle(Ldst,(boxes_f[i][0],boxes_f[i][1]),(boxes_f[i][2],boxes_f[i][3]),(0,255,0),2)
+                cv2.putText(Ldst,str(labels_f[i])+" : "+str(scores_f[i])+" || {0:.2f},{0:.2f},{0:.2f}".format(np.min(d),np.mean(d),np.max(d)),(boxes_f[i][0],boxes_f[i][1]-10),0,1,(0,255,0),2)
+        et = time.time()
+    except:
+        pass
+    print("yolo time = ",et-st)
 
     #% plotting ------------------------------
     imagesdst=[Ldst,Rdst]

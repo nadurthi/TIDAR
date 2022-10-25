@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "rcutils/allocator.h"
+
 
 // Include directives for member types
 // Member `stamp`
@@ -39,17 +41,60 @@ velodyne_msgs__msg__VelodynePacket__fini(velodyne_msgs__msg__VelodynePacket * ms
   // data
 }
 
+bool
+velodyne_msgs__msg__VelodynePacket__are_equal(const velodyne_msgs__msg__VelodynePacket * lhs, const velodyne_msgs__msg__VelodynePacket * rhs)
+{
+  if (!lhs || !rhs) {
+    return false;
+  }
+  // stamp
+  if (!builtin_interfaces__msg__Time__are_equal(
+      &(lhs->stamp), &(rhs->stamp)))
+  {
+    return false;
+  }
+  // data
+  for (size_t i = 0; i < 1206; ++i) {
+    if (lhs->data[i] != rhs->data[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool
+velodyne_msgs__msg__VelodynePacket__copy(
+  const velodyne_msgs__msg__VelodynePacket * input,
+  velodyne_msgs__msg__VelodynePacket * output)
+{
+  if (!input || !output) {
+    return false;
+  }
+  // stamp
+  if (!builtin_interfaces__msg__Time__copy(
+      &(input->stamp), &(output->stamp)))
+  {
+    return false;
+  }
+  // data
+  for (size_t i = 0; i < 1206; ++i) {
+    output->data[i] = input->data[i];
+  }
+  return true;
+}
+
 velodyne_msgs__msg__VelodynePacket *
 velodyne_msgs__msg__VelodynePacket__create()
 {
-  velodyne_msgs__msg__VelodynePacket * msg = (velodyne_msgs__msg__VelodynePacket *)malloc(sizeof(velodyne_msgs__msg__VelodynePacket));
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  velodyne_msgs__msg__VelodynePacket * msg = (velodyne_msgs__msg__VelodynePacket *)allocator.allocate(sizeof(velodyne_msgs__msg__VelodynePacket), allocator.state);
   if (!msg) {
     return NULL;
   }
   memset(msg, 0, sizeof(velodyne_msgs__msg__VelodynePacket));
   bool success = velodyne_msgs__msg__VelodynePacket__init(msg);
   if (!success) {
-    free(msg);
+    allocator.deallocate(msg, allocator.state);
     return NULL;
   }
   return msg;
@@ -58,10 +103,11 @@ velodyne_msgs__msg__VelodynePacket__create()
 void
 velodyne_msgs__msg__VelodynePacket__destroy(velodyne_msgs__msg__VelodynePacket * msg)
 {
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   if (msg) {
     velodyne_msgs__msg__VelodynePacket__fini(msg);
   }
-  free(msg);
+  allocator.deallocate(msg, allocator.state);
 }
 
 
@@ -71,9 +117,11 @@ velodyne_msgs__msg__VelodynePacket__Sequence__init(velodyne_msgs__msg__VelodyneP
   if (!array) {
     return false;
   }
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   velodyne_msgs__msg__VelodynePacket * data = NULL;
+
   if (size) {
-    data = (velodyne_msgs__msg__VelodynePacket *)calloc(size, sizeof(velodyne_msgs__msg__VelodynePacket));
+    data = (velodyne_msgs__msg__VelodynePacket *)allocator.zero_allocate(size, sizeof(velodyne_msgs__msg__VelodynePacket), allocator.state);
     if (!data) {
       return false;
     }
@@ -90,7 +138,7 @@ velodyne_msgs__msg__VelodynePacket__Sequence__init(velodyne_msgs__msg__VelodyneP
       for (; i > 0; --i) {
         velodyne_msgs__msg__VelodynePacket__fini(&data[i - 1]);
       }
-      free(data);
+      allocator.deallocate(data, allocator.state);
       return false;
     }
   }
@@ -106,6 +154,8 @@ velodyne_msgs__msg__VelodynePacket__Sequence__fini(velodyne_msgs__msg__VelodyneP
   if (!array) {
     return;
   }
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+
   if (array->data) {
     // ensure that data and capacity values are consistent
     assert(array->capacity > 0);
@@ -113,7 +163,7 @@ velodyne_msgs__msg__VelodynePacket__Sequence__fini(velodyne_msgs__msg__VelodyneP
     for (size_t i = 0; i < array->capacity; ++i) {
       velodyne_msgs__msg__VelodynePacket__fini(&array->data[i]);
     }
-    free(array->data);
+    allocator.deallocate(array->data, allocator.state);
     array->data = NULL;
     array->size = 0;
     array->capacity = 0;
@@ -127,13 +177,14 @@ velodyne_msgs__msg__VelodynePacket__Sequence__fini(velodyne_msgs__msg__VelodyneP
 velodyne_msgs__msg__VelodynePacket__Sequence *
 velodyne_msgs__msg__VelodynePacket__Sequence__create(size_t size)
 {
-  velodyne_msgs__msg__VelodynePacket__Sequence * array = (velodyne_msgs__msg__VelodynePacket__Sequence *)malloc(sizeof(velodyne_msgs__msg__VelodynePacket__Sequence));
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  velodyne_msgs__msg__VelodynePacket__Sequence * array = (velodyne_msgs__msg__VelodynePacket__Sequence *)allocator.allocate(sizeof(velodyne_msgs__msg__VelodynePacket__Sequence), allocator.state);
   if (!array) {
     return NULL;
   }
   bool success = velodyne_msgs__msg__VelodynePacket__Sequence__init(array, size);
   if (!success) {
-    free(array);
+    allocator.deallocate(array, allocator.state);
     return NULL;
   }
   return array;
@@ -142,8 +193,66 @@ velodyne_msgs__msg__VelodynePacket__Sequence__create(size_t size)
 void
 velodyne_msgs__msg__VelodynePacket__Sequence__destroy(velodyne_msgs__msg__VelodynePacket__Sequence * array)
 {
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
   if (array) {
     velodyne_msgs__msg__VelodynePacket__Sequence__fini(array);
   }
-  free(array);
+  allocator.deallocate(array, allocator.state);
+}
+
+bool
+velodyne_msgs__msg__VelodynePacket__Sequence__are_equal(const velodyne_msgs__msg__VelodynePacket__Sequence * lhs, const velodyne_msgs__msg__VelodynePacket__Sequence * rhs)
+{
+  if (!lhs || !rhs) {
+    return false;
+  }
+  if (lhs->size != rhs->size) {
+    return false;
+  }
+  for (size_t i = 0; i < lhs->size; ++i) {
+    if (!velodyne_msgs__msg__VelodynePacket__are_equal(&(lhs->data[i]), &(rhs->data[i]))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool
+velodyne_msgs__msg__VelodynePacket__Sequence__copy(
+  const velodyne_msgs__msg__VelodynePacket__Sequence * input,
+  velodyne_msgs__msg__VelodynePacket__Sequence * output)
+{
+  if (!input || !output) {
+    return false;
+  }
+  if (output->capacity < input->size) {
+    const size_t allocation_size =
+      input->size * sizeof(velodyne_msgs__msg__VelodynePacket);
+    velodyne_msgs__msg__VelodynePacket * data =
+      (velodyne_msgs__msg__VelodynePacket *)realloc(output->data, allocation_size);
+    if (!data) {
+      return false;
+    }
+    for (size_t i = output->capacity; i < input->size; ++i) {
+      if (!velodyne_msgs__msg__VelodynePacket__init(&data[i])) {
+        /* free currently allocated and return false */
+        for (; i-- > output->capacity; ) {
+          velodyne_msgs__msg__VelodynePacket__fini(&data[i]);
+        }
+        free(data);
+        return false;
+      }
+    }
+    output->data = data;
+    output->capacity = input->size;
+  }
+  output->size = input->size;
+  for (size_t i = 0; i < input->size; ++i) {
+    if (!velodyne_msgs__msg__VelodynePacket__copy(
+        &(input->data[i]), &(output->data[i])))
+    {
+      return false;
+    }
+  }
+  return true;
 }

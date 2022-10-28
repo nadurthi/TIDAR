@@ -202,7 +202,7 @@ def umeyama(P, Q):
 
     return c, R, t
 
-<<<<<<< HEAD
+
 ret,rvec,tvec=cv2.solvePnP(optipoints, cor,K, None )
 Rcam_w,J = cv2.Rodrigues(rvec)  
 Hcam_w = np.identity(4)
@@ -216,7 +216,6 @@ ax.plot(optipoints_f[:,0],optipoints_f[:,1],optipoints_f[:,2],'ro')
 # ax.plot(optipoints_f[:,0],optipoints_f[:,1],optipoints_f[:,2],'bo')
 
 c, R, t=umeyama(optipoints_c,optipoints_f)
-=======
 
 
 fig = plt.figure()
@@ -224,5 +223,4 @@ ax = plt.axes(projection='3d')
 ax.plot(X[:,0],X[:,1],X[:,2],'ro')
 # ax.plot(optipoints_f[:,0],optipoints_f[:,1],optipoints_f[:,2],'bo')
 
-c, R, t=umeyama(X,optipoints_f)
->>>>>>> f4be72d8005d298619a7e72c4be9734aa8e04827
+

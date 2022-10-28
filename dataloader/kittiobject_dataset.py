@@ -66,7 +66,7 @@ class KittiMOTDataset:
                  use_difficult=False, return_difficult=False,
                  ):
 
-        kittitracking2.KittiObjectTracking()
+#        kittitracking2.KittiObjectTracking()
 
         # if split not in ['train', 'trainval', 'val']:
         #     if not (split == 'test' and year == '2007'):

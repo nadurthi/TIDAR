@@ -7,10 +7,13 @@ __pycache__/
 *.7z
 *.pyc
 calibration_images/
+camera_saved_data/
+camera_calibration_data/
 *.tar.gz
 *~
 *.pcd
 *.ply
+*.pkl
 *.user
 doc
 TAGS
@@ -21,6 +24,12 @@ TAGS
 # Distribution / packaging
 .Python
 build/
+bestmodels/
+mboutput/
+build/
+install/
+checkpoint/
+checkpoints/
 develop-eggs/
 dist/
 log/
@@ -28,6 +37,7 @@ sampleset1/
 sampleset/
 sampleset2/
 simulations/
+simulation/
 downloads/
 calibration_images/
 eggs/

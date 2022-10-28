@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/TIDAR.iml" filepath="$PROJECT_DIR$/.idea/TIDAR.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../shiptracking/.idea/shiptracking.iml" filepath="$PROJECT_DIR$/../shiptracking/.idea/shiptracking.iml" />
     </modules>
   </component>
 </project>

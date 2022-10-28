@@ -8,6 +8,7 @@ endif()
 
 find_package(CUDA REQUIRED)
 find_package(Boost 1.47.0 REQUIRED  COMPONENTS system filesystem) 
+find_package(SGM)
 
 find_package(OpenCV REQUIRED)
 if (OpenCV_VERSION VERSION_LESS 3.0)

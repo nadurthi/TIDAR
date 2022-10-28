@@ -32,7 +32,7 @@ def disparity_loader(path):
 
 class myImageFloder(data.Dataset):
 
-    def __init__(self, left, right, left_disparity, mode='train',right_disparity=None, loader=default_loader, dploader=disparity_loader, rand_scale=[0.225,0.6], rand_bright=[0.5,2.], order=0):
+    def __init__(self, left, right, left_disparity, calib=None,mode='train',right_disparity=None, loader=default_loader, dploader=disparity_loader, rand_scale=[0.225,0.6], rand_bright=[0.5,2.], order=0):
         self.left = left
         self.right = right
         self.disp_L = left_disparity
@@ -43,6 +43,7 @@ class myImageFloder(data.Dataset):
         self.rand_bright = rand_bright
         self.order = order
         self.mode = mode
+        self.calib=calib
 
     def __getitem__(self, index):
         left = self.left[index]
@@ -123,7 +124,7 @@ class myImageFloder(data.Dataset):
         processed = preprocess.get_transform()
         left_img = processed(left_img)
         right_img = processed(right_img)
-        return (left_img, right_img, dataL,(left,right))
+        return (left_img, right_img, dataL,(left,right,self.calib[index]))
 
     def __len__(self):
         return len(self.left)

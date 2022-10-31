@@ -39,6 +39,12 @@
       <change beforePath="$PROJECT_DIR$/ros2_ws/install/turtlesim/lib/turtlesim/turtlesim_node" beforeDir="false" afterPath="$PROJECT_DIR$/ros2_ws/install/turtlesim/lib/turtlesim/turtlesim_node" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ros2_ws/install/turtlesim/share/turtlesim/cmake/ament_cmake_export_targets-extras.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/ros2_ws/install/turtlesim/share/turtlesim/cmake/ament_cmake_export_targets-extras.cmake" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ros2_ws/install/turtlesim/share/turtlesim/cmake/turtlesim__rosidl_generator_cExport.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/ros2_ws/install/turtlesim/share/turtlesim/cmake/turtlesim__rosidl_generator_cExport.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ros2_ws/install/turtlesim/share/turtlesim/images/ardent.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ros2_ws/install/turtlesim/share/turtlesim/images/bouncy.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ros2_ws/install/turtlesim/share/turtlesim/images/crystal.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ros2_ws/install/turtlesim/share/turtlesim/images/dashing.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ros2_ws/install/turtlesim/share/turtlesim/images/eloquent.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ros2_ws/install/turtlesim/share/turtlesim/images/foxy.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ros2_ws/install/turtlesim/share/turtlesim/local_setup.sh" beforeDir="false" afterPath="$PROJECT_DIR$/ros2_ws/install/turtlesim/share/turtlesim/local_setup.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ros2_ws/install/turtlesim/share/turtlesim/package.sh" beforeDir="false" afterPath="$PROJECT_DIR$/ros2_ws/install/turtlesim/share/turtlesim/package.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ros2_ws/install/velodyne/share/ament_index/resource_index/parent_prefix_path/velodyne" beforeDir="false" afterPath="$PROJECT_DIR$/ros2_ws/install/velodyne/share/ament_index/resource_index/parent_prefix_path/velodyne" afterDir="false" />
@@ -71,6 +77,12 @@
       <change beforePath="$PROJECT_DIR$/ros2_ws/install/zed_components/share/zed_components/package.ps1" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ros2_ws/install/zed_components/share/zed_components/package.sh" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ros2_ws/install/zed_components/share/zed_components/package.zsh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ros2_ws/src/ros_tutorials/turtlesim/images/ardent.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ros2_ws/src/ros_tutorials/turtlesim/images/bouncy.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ros2_ws/src/ros_tutorials/turtlesim/images/crystal.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ros2_ws/src/ros_tutorials/turtlesim/images/dashing.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ros2_ws/src/ros_tutorials/turtlesim/images/eloquent.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ros2_ws/src/ros_tutorials/turtlesim/images/foxy.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/stereocodes/SGMpython/libsgm_stereo.cu" beforeDir="false" afterPath="$PROJECT_DIR$/stereocodes/SGMpython/libsgm_stereo.cu" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/stereocodes/SGMpython/test_mul.sublime-workspace" beforeDir="false" afterPath="$PROJECT_DIR$/stereocodes/SGMpython/test_mul.sublime-workspace" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../shiptracking/opti_track_recorder/pyoptitrak/NatNetClient.py" beforeDir="false" afterPath="$PROJECT_DIR$/../shiptracking/opti_track_recorder/pyoptitrak/NatNetClient.py" afterDir="false" />

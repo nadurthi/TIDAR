@@ -26,7 +26,9 @@ class Encoders{
     }
     
     void encoderCount();
+    bool isEncoderOnIndex();
     long getEncoderCount();
+    long getEncoderRev();
     void setEncoderCount(long);
     long getEncoderErrorCount();
     static Encoders *_instances[MAX_NUM_ENCODERS];

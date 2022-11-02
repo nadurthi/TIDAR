@@ -39,12 +39,26 @@ Encoders::Encoders(byte pinA, byte pinB, byte pinI){
 }
 
 
-
+bool Encoders::isEncoderOnIndex(){
+  int EncoderPhaseA = digitalRead(this->_encoderPINA);  // MSB
+  int EncoderPhaseB = digitalRead(this->_encoderPINB);  // LSB
+  int EncoderPhaseI = digitalRead(this->_encoderPINI); 
+  if (EncoderPhaseI==HIGH && EncoderPhaseB==LOW  && EncoderPhaseA==LOW){
+    return 1;
+  }
+  else{
+    return 0;
+  }
+}
 
 void Encoders::encoderCount(){
   int EncoderPhaseA = digitalRead(this->_encoderPINA);  // MSB
   int EncoderPhaseB = digitalRead(this->_encoderPINB);  // LSB
-
+  int EncoderPhaseI = digitalRead(this->_encoderPINI); 
+  if (isEncoderOnIndex()){
+    _encoderRevs=_encoderRevs+1;
+  }
+  
   int currentEncoded = (EncoderPhaseA << 1) | EncoderPhaseB;
   int sum = (this->_lastEncoded << 2) | currentEncoded;
   switch(sum){
@@ -67,11 +81,16 @@ void Encoders::encoderCount(){
   this->_lastEncoded = currentEncoded;
 }
 
+long Encoders::getEncoderRev(){
+  return _encoderRevs;
+}
+
 long Encoders::getEncoderCount(){
   return _encoderCount;
 }
 void Encoders::setEncoderCount(long setEncoderVal){
   this->_encoderCount = setEncoderVal;
+  this->_encoderRevs = 0;
 }
 
 long Encoders::getEncoderErrorCount(){

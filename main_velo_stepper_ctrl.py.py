@@ -7,8 +7,8 @@ Created on Tue Nov  1 18:16:10 2022
 import serial
 import time
 
-arduino = serial.Serial(port='/dev/ttyACM1', baudrate=9600, timeout=.1)
-time.sleep(1)
+arduino = serial.Serial(port='/dev/ttyACM0', baudrate=9600, timeout=None)
+time.sleep(5)
 
 
 arduino.reset_input_buffer()
@@ -38,6 +38,9 @@ def write_read(x,retflag=None):
         return True,data
 # value = write_read('s\n',retflag='ok')
 # print(value) # printing the value
+
+value = write_read('g\n', retflag=None)
+print(value)  # printing the value
 
 
 value = write_read('-1000\n',retflag='ok')

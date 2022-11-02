@@ -55,30 +55,30 @@ class VeloSubscriber(Node):
 
 class ArduinoStepper:
     def __init__(self):
-        self.arduino=serial.Serial(port='/dev/ttyACM1', baudrate=9600, timeout=.1)
+        self.arduino=serial.Serial(port='/dev/ttyACM1', baudrate=9600, timeout=None)
 
     def write_read(self,x, retflag=None):
         # self.arduino.reset_input_buffer()
         # self.arduino.reset_output_buffer()
         self.arduino.write(bytes(x, 'utf-8'))
 
-        # arduino.flush()
 
-        # data = None
-        # while (data is None):
-        #     data = self.arduino.readline()
-        #     if len(data) == 0:
-        #         data = None
-        #
-        # data = data.decode()
-        #
-        # if retflag is not None:
-        #     if retflag in data:
-        #         return True, data
-        #     else:
-        #         return False, data
-        # else:
-        #     return True, data
+
+        data = None
+        while (data is None):
+            data = self.arduino.readline()
+            if len(data) == 0:
+                data = None
+
+        data = data.decode()
+
+        if retflag is not None:
+            if retflag in data:
+                return True, data
+            else:
+                return False, data
+        else:
+            return True, data
 
 
 if __name__=="__main__":

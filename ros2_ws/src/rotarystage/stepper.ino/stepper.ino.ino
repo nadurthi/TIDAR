@@ -9,14 +9,16 @@ const int pulsePin =  6;// the number of the LED pin
 
 const byte numChars = 32;
 char receivedChars[numChars];   // an array to store the received data
-
+char command[25];
 boolean newData = false;
 
 unsigned long lastMilli = 0;       // will store last time LED was updated
 
 int flg=0;
 int Z=0;
-int steps=0;
+int steploc=0;
+int currsteploc=0;
+
 void setup() {
   // set the digital pin as output:
   pinMode(dirPin, OUTPUT);
@@ -37,20 +39,25 @@ void setup() {
 }
 
 void loop() {
-    if (steps>0){
-//      leftEncoder.setEncoderCount(0);
+    if (steploc!=currsteploc){
+
       long prevLeftEncoderCount = leftEncoder.getEncoderCount();
       long currentLeftEncoderCount=prevLeftEncoderCount;
-      long totalencodercount = 10*(steps-1);
+      
       int i=0;
-//      Serial.print(steps);
-//      Serial.print(", ");
-//      Serial.print(prevLeftEncoderCount);
-//      Serial.print(", ");
-//      Serial.print(currentLeftEncoderCount);
-//      Serial.print(", ");
-//      Serial.println(totalencodercount);
-      while(i<steps || (abs(currentLeftEncoderCount-prevLeftEncoderCount)<totalencodercount)){
+      int steps=0;
+      if (steploc>currsteploc){
+        digitalWrite(dirPin, LOW);
+        long totalencodercount = 10*(steploc-currsteploc);
+        steps = steploc-currsteploc;
+      }  
+      else{
+        digitalWrite(dirPin, HIGH);
+        long totalencodercount = 10*(currsteploc-steploc);
+        steps = currsteploc-steploc;
+      }
+      
+      while(i<steploc){
         digitalWrite(pulsePin, HIGH);
         delay(1);
         digitalWrite(pulsePin, LOW);
@@ -58,68 +65,110 @@ void loop() {
         ++i;
         currentLeftEncoderCount = leftEncoder.getEncoderCount();
       }
-      Serial.println("ok");
+      Serial.println("<>");
+      currsteploc=steploc;
+      steploc=0;
       steps=0;
     }
 
-    int j=0;
-    if (Serial.available()>0){
-      while(1)
-      {
-       char c = Serial.read();
-       receivedChars[j]=c;
-       ++j;
-       if(c == '\n'){
-          break;
-       }
-       
-        if(c=='-')
-            digitalWrite(dirPin, HIGH);
-        else if(c=='+') 
-            digitalWrite(dirPin, LOW);  
-        else if(c=='s'){
-            leftEncoder.setEncoderCount(0);
-            Serial.println("ok");
-        }
-        else if(c=='g'){
-            long EncoderCount = leftEncoder.getEncoderCount();
-            Serial.println(EncoderCount);
-            break;
-        }
-        else if(c=='h'){
 
-          long EncoderCount = leftEncoder.getEncoderCount();
-          if(EncoderCount>0)
-            digitalWrite(dirPin, HIGH);
-          else
-            digitalWrite(dirPin, LOW);
-          steps = abs(EncoderCount)/10-1;
-          break;
-         }
-        else if(c=='0' || c=='1' || c=='2' || c=='3' || c=='4' || c=='5' || c=='6' || c=='7' || c=='8' || c=='9'){ 
-            steps = steps * 10;
-            steps = steps + (c - '0');  // Subtract '0' to adjust from ascii back to real numbers
-          }
-         
-      }
-      while(Serial.available()>0)
-         char c = Serial.read();
+    if (Serial.available()>0){
+      recvWithEndMarker();
+      parseCommand();
+    }
+
+    
     }
     
-  
-//  if(millis()-lastMilli > 50){ 
-//    
-//    long currentLeftEncoderCount = leftEncoder.getEncoderCount();
-//    long currentRev = leftEncoder.getEncoderRev();
-//    Serial.print("steps = ");
-//    Serial.print(steps);
-//    Serial.print(", revs = ");
-//    Serial.print(currentRev);
-//    Serial.print(" , count = ");
-//    Serial.println(currentLeftEncoderCount);
-//
-//    
-//    
-//    lastMilli = millis();
-//  }
+
+
+
+void recvWithEndMarker()
+{
+
+   char rc;
+    lastMilli = millis();
+    int j=0;
+   while (millis()-lastMilli < 100)
+   {
+      rc = Serial.read();
+      receivedChars[j]=rc;  
+      j=j+1;
+      
+   }
+   receivedChars[j] = '\0'; // terminate the string
+   bool st=0,et=0;
+   int k=0;
+   for(int i=0;i<j;++i){
+    if (receivedChars[i]=='\0'){
+      break;
+    }
+     if (receivedChars[i]=='<'){
+        st=1;
+        receivedChars[i]='\0';  
+        continue;
+     }
+     if (receivedChars[i]=='>'){
+      et==1;
+      receivedChars[i]='\0';
+      break;
+     }
+     if(st==1){
+      command[k]=receivedChars[i];
+      receivedChars[i]='\0';
+      k=k+1;
+     }
+   }
+   if(st==1 && et==1){
+    command[k]='\0';
+    newData = true;
+   }
+   else{
+    command[0]='\0';
+    newData = false;
+   }
+   
+}
+
+void parseCommand(){
+  if(newData==false)
+    return;
+  int j=0;
+  char c;
+  steploc=0;
+  while(1)
+  {
+    c = command[j];
+    if (c=='\0')
+      break;
+   ++j;
+
+    if(c=='p'){
+      Serial.println("<>");
+    }
+    else if(c=='s'){
+        leftEncoder.setEncoderCount(0);
+        currsteploc=0;
+        Serial.println("<>");
+    }
+    else if(c=='g'){
+        char buff[25];
+        sprintf(buff, "<%d>", currsteploc);
+        Serial.println(buff);
+        break;
+    }
+    else if(c=='e'){
+        char buff[25];
+         long LeftEncoderCount = leftEncoder.getEncoderCount();
+        sprintf(buff, "<%d>", LeftEncoderCount);
+        Serial.println(buff);
+        break;
+    }
+    else if(c=='0' || c=='1' || c=='2' || c=='3' || c=='4' || c=='5' || c=='6' || c=='7' || c=='8' || c=='9'){ 
+        steploc = steploc * 10;
+        steploc = steploc + (c - '0');  // Subtract '0' to adjust from ascii back to real numbers
+      }
+     
+  }
+  newData=false;
 }

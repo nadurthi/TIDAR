@@ -53,33 +53,28 @@ class VeloSubscriber(Node):
 
 
 
-class ArduinoStepper:
-    def __init__(self):
-        self.arduino=serial.Serial(port='/dev/ttyACM1', baudrate=9600, timeout=None)
-
-    def write_read(self,x, retflag=None):
-        # self.arduino.reset_input_buffer()
-        # self.arduino.reset_output_buffer()
-        self.arduino.write(bytes(x, 'utf-8'))
-
-
-
-        data = None
-        while (data is None):
-            data = self.arduino.readline()
-            if len(data) == 0:
-                data = None
-
-        data = data.decode()
-
-        if retflag is not None:
-            if retflag in data:
-                return True, data
-            else:
-                return False, data
-        else:
-            return True, data
-
+class ArduinoCtrl:
+    def __init__(self,port='/dev/ttyACM0'):
+        self.serialcom = serial.Serial(port=port, baudrate=9600, timeout=None)
+        time.sleep(5)
+        self.serialcom.reset_input_buffer()
+        self.serialcom.reset_output_buffer()
+        
+    def write_read(self,x):
+    
+        self.serialcom.write(bytes(x, 'utf-8'))
+    
+        data=None
+        while(data is None):
+            data = self.serialcom.readline()
+            if len(data)==0:
+                data=None
+    
+        data=data.decode()
+    
+        return data
+    def close(self):
+        self.serialcom.close()
 
 if __name__=="__main__":
     saveset = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
@@ -94,8 +89,8 @@ if __name__=="__main__":
     step=0
     try:
         # rclpy.spin(velo_subscriber)
-        ardstepper = ArduinoStepper()
-        time.sleep(1)
+        ardstepper = ArduinoCtrl()
+        
 
         rclpy.init(args=None)
         velo_subscriber = VeloSubscriber()
@@ -134,7 +129,7 @@ if __name__=="__main__":
         doneflg.set()
         velo_subscriber.destroy_node()
         rclpy.shutdown()
-        ardstepper.arduino.close()
+        ardstepper.close()
 
 
 

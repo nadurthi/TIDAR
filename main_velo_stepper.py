@@ -20,6 +20,26 @@ from sensor_msgs.msg import LaserScan,PointCloud2
 import numpy as np
 import sys
 
+def get_xyzi_points(cloud_array, remove_nans=True, dtype=np.float):
+    '''Pulls out x, y, and z columns from the cloud recordarray, and returns
+	a 3xN matrix.
+    '''
+    # remove crap points
+    if remove_nans:
+        mask = np.isfinite(cloud_array['x']) & np.isfinite(cloud_array['y']) & np.isfinite(cloud_array['z'])
+        cloud_array = cloud_array[mask]
+    
+    # pull out x, y, and z values
+    points = np.zeros(cloud_array.shape + (4,), dtype=dtype)
+    points[...,0] = cloud_array['x']
+    points[...,1] = cloud_array['y']
+    points[...,2] = cloud_array['z']
+    points[...,3] = cloud_array['intensity']
+    
+    return points
+
+def pointcloud2_to_xyzi_array(cloud_msg, remove_nans=True):
+    return get_xyzi_points(rnp.point_cloud2.pointcloud2_to_array(cloud_msg), remove_nans=remove_nans)
 
 class VeloSubscriber(Node):
 
@@ -29,17 +49,16 @@ class VeloSubscriber(Node):
             PointCloud2,
             'velodyne_points',
             self.listener_callback,
-            10)
+            1)
         self.q = []
         self.cnt = 0
-
+        self.N=0
 
     def listener_callback(self, msg):
-        X = rnp.point_cloud2.pointcloud2_to_xyz_array(msg, remove_nans=True)
-        if len(self.q)>15:
-            self.q=[]
-
-        self.q.append(X)
+        X = pointcloud2_to_xyzi_array(msg, remove_nans=True)
+        if self.N>0:
+            self.q.append(X)
+            
         #        thrd = threading.Thread(target=savePCD, args=(X,self.cnt))
         #        thrd.daemon=True
         #        thrd.start()
@@ -98,23 +117,26 @@ if __name__=="__main__":
         print('before')
         while 1:
             print(step)
+            time.sleep(0.5)
             rclpy.spin_once(velo_subscriber,timeout_sec=0.01)
             print("spinned first")
-            value = ardstepper.write_read('+%d\n'%dang, retflag='ok')
-            time.sleep(1)
-            print("steped ok")
+            value = ardstepper.write_read('<%d>'%step)
+            print(ardstepper.write_read('<g>'))
             velo_subscriber.q=[]
-            for i in range(5):
-                rclpy.spin_once(velo_subscriber, timeout_sec=0.01)
-                print("itertating spin")
-            print(len(velo_subscriber.q))
+            velo_subscriber.N=4
+            while(1):
+                rclpy.spin_once(velo_subscriber, timeout_sec=0.1)
+                if len(velo_subscriber.q)>5:
+                    break
+            velo_subscriber.N=0
             for i in range(min(4,len(velo_subscriber.q))):
                 velo_subscriber.q[i].astype(np.float32).tofile(os.path.join(folder,'velo_%05d_%02d.bin'%(step,i)))
                 print('writn gto file')
             step=step+dang
             if step>16000-dang:
+                step=0
                 print("done with one rev - homing and shutdown node")
-                value = ardstepper.write_read('h\n', retflag='ok')
+                value = ardstepper.write_read('<0>')
                 break
 
     except KeyboardInterrupt:
@@ -129,6 +151,7 @@ if __name__=="__main__":
         doneflg.set()
         velo_subscriber.destroy_node()
         rclpy.shutdown()
+        value = ardstepper.write_read('<0>')
         ardstepper.close()
 
 

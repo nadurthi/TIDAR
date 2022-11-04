@@ -48,6 +48,7 @@ void loop() {
 //      Serial.println(currsteploc);
 
       if (steploc==currsteploc){
+        Serial.println("<ok>");
         newData=false;
         return;
       }

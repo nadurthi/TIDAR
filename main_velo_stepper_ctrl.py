@@ -39,11 +39,11 @@ class ArduinoCtrl:
 
 ard=ArduinoCtrl()
 
-value = ard.write_read('<e>')
+value = ard.write_read('<s>')
 print(value)  # printing the value
 
 
-value = ard.write_read('<0>')
+value = ard.write_read('<2100>')
 print(value) # printing the value
 
 ard.close()

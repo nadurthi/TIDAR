@@ -104,7 +104,7 @@ if __name__=="__main__":
     doneflg.clear()
 
 
-    dang=100
+    dang=25
     step=0
     try:
         # rclpy.spin(velo_subscriber)
@@ -117,7 +117,7 @@ if __name__=="__main__":
         print('before')
         while 1:
             print(step)
-            time.sleep(0.5)
+            time.sleep(0.01)
             rclpy.spin_once(velo_subscriber,timeout_sec=0.01)
             print("spinned first")
             value = ardstepper.write_read('<%d>'%step)
@@ -126,12 +126,15 @@ if __name__=="__main__":
             velo_subscriber.N=4
             while(1):
                 rclpy.spin_once(velo_subscriber, timeout_sec=0.1)
-                if len(velo_subscriber.q)>5:
+                if len(velo_subscriber.q)>2:
                     break
             velo_subscriber.N=0
-            for i in range(min(4,len(velo_subscriber.q))):
-                velo_subscriber.q[i].astype(np.float32).tofile(os.path.join(folder,'velo_%05d_%02d.bin'%(step,i)))
-                print('writn gto file')
+            # for i in range(min(4,len(velo_subscriber.q))):
+            st=time.time()
+            velo_subscriber.q[-1].astype(np.float32).tofile(os.path.join(folder,'velo_%05d_%02d.bin'%(step,0)))
+            et=time.time()
+            print("time to write = ",et-st)
+            # print('writn gto file')
             step=step+dang
             if step>16000-dang:
                 step=0

@@ -172,14 +172,3 @@ if __name__=="__main__":
 
 
 
-    # value = write_read('s\n',retflag='ok')
-# print(value) # printing the value
-
-
-# value = write_read('h\n', retflag='ok')
-# print(value)  # printing the value
-# 
-# value = write_read('g\n', retflag=None)
-# print(value)  # printing the value
-# 
-# 

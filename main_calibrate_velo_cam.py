@@ -24,7 +24,7 @@ def Hmat(eulangles,t):
 
 Hest=np.linalg.multi_dot([Hmat([0,0,0],[0,0.01,0]),Hmat([0,0,-85],[0,0,0]),Hmat([0,0,0],[0,-0.055,0]),Hmat([0,0,0],[0,0,0.04])])
 
-folder='simulations/cam_velo_stepper/2022-11-07-13-18-46'
+folder='simulations/cam_velo_stepper/2022-11-07-16-38-06'
 X=[]
 for step in range(0,8000,100):
     i=3
@@ -229,25 +229,32 @@ print(Hest.round(3))
 
 with open(os.path.join(folder,'velo_step_calib.pkl'),'wb') as F:
     pkl.dump([Hest,Hest_opt],F)
-#%%
+#%%  -------------------------------------------------------------------------------------------------------
 
-Hest_opt
+with open(os.path.join('calibfiles','velo_step_calib.pkl'),'rb') as F:
+    [Hest,Hest_opt]=pkl.load(F)
+
 
 
 # o3d.visualization.draw_geometries([source_pcd,target_pcd])
 X=[]
 p1=0
 pcd=None
-for p2,step in enumerate(range(0,15999,100)):
-    i=3
-    print(p2,step)
+mn=1
+mx=150
+
+for step in range(0,9000,20):
+    i=0
+    print(step)
     fname=os.path.join(os.path.join(folder,'velo_%05d_%02d.bin'%(step,i)))
+    if os.path.isfile(fname) is False:
+        continue
     x=np.fromfile(fname, dtype=np.float32).reshape(4,-1,order='F').T
     R=np.array([[0,-1,0],[1,0,0],[0,0,1]])
     x[:,:3]=R.dot(x[:,:3].T).T
     # X.append(x)
     
-    ang= (p2-p1)*2.25
+    ang= (step-0)*0.9/40
     Hr = Hmat([-ang,0,0],[0,0,0])
     Hrv=Hest_opt
     Hvr=np.linalg.inv(Hrv)
@@ -258,6 +265,12 @@ for p2,step in enumerate(range(0,15999,100)):
 
     source_pcd = o3d.geometry.PointCloud()
     source_pcd.points = o3d.utility.Vector3dVector(x[:,:3])
+    c=x[:, 3]
+    mn=min(mn,np.min(c))
+    mx = min(mx, np.max(c))
+    c=(c-mn)/mx
+    cols = np.ones((len(c),3))*c.reshape(-1,1)
+    source_pcd.colors = o3d.utility.Vector3dVector(cols)
     source_pcd=source_pcd.transform(H)
     # source_pcd=source_pcd.voxel_down_sample(voxel_size=0.025)
     # source_pcd.estimate_normals(
@@ -273,6 +286,7 @@ for p2,step in enumerate(range(0,15999,100)):
 o3d.visualization.draw_geometries([pcd])
 pcd.estimate_normals(
         search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.25, max_nn=30))
+o3d.io.write_point_cloud(os.path.join(folder,'cummulative_pcd.pcd'), pcd)
 
 # with o3d.utility.VerbosityContextManager(
 #         o3d.utility.VerbosityLevel.Debug) as cm:

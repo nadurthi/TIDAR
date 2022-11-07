@@ -43,7 +43,7 @@ value = ard.write_read('<s>')
 print(value)  # printing the value
 
 
-value = ard.write_read('<2100>')
+value = ard.write_read('<2050>')
 print(value) # printing the value
 
 ard.close()

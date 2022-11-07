@@ -524,12 +524,13 @@ class FmtDesc:
 
 
 class MultiTis:
-    def __init__(self,configfile):
+    def __init__(self,configfile,onlycams=[0,1,2]):
         with open(configfile) as jsonFile:
             self.cameraconfigs = json.load(jsonFile)
             jsonFile.close()
         
         self.cameraconfigs['cameras'] = sorted(self.cameraconfigs['cameras'],key=lambda x: x['cam_pos'])
+        self.cameraconfigs['cameras'] = [self.cameraconfigs['cameras'][i] for i in onlycams]
         self.TisCams = []
         
     def stop_cameras(self):

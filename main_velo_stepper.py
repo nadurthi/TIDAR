@@ -19,6 +19,15 @@ from std_msgs.msg import String
 from sensor_msgs.msg import LaserScan,PointCloud2
 import numpy as np
 import sys
+from camerahardware import TIS
+import cv2
+
+mTis=None
+try:
+    mTis = TIS.MultiTis("camerahardware/cameras.json",onlycams=[0])
+    mTis.start_cameras()
+except:
+    print("No cams initialized")
 
 def get_xyzi_points(cloud_array, remove_nans=True, dtype=np.float):
     '''Pulls out x, y, and z columns from the cloud recordarray, and returns
@@ -104,13 +113,17 @@ if __name__=="__main__":
     doneflg.clear()
 
 
-    dang=25
+    dang=20
     step=0
     try:
         # rclpy.spin(velo_subscriber)
         ardstepper = ArduinoCtrl()
-        
 
+        if mTis is not None:
+            images = mTis.snapImages()
+            for i,img in enumerate(images):
+                cv2.imwrite(os.path.join(folder, "cam_%02d.png" %i), img)
+            print("done saving image")
         rclpy.init(args=None)
         velo_subscriber = VeloSubscriber()
 
@@ -136,7 +149,7 @@ if __name__=="__main__":
             print("time to write = ",et-st)
             # print('writn gto file')
             step=step+dang
-            if step>16000-dang:
+            if step>9000-dang:
                 step=0
                 print("done with one rev - homing and shutdown node")
                 value = ardstepper.write_read('<0>')

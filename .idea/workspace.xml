@@ -5,23 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="83b9cf58-4e61-445f-8783-5c8b8a4ff83d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/TIDAR.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/TIDAR.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/camerahardware/velodynecalib.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.~1O58ZmlIj2XhPNZqhyaerTbISX_T66Tfw-b58d6a.insyncdl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/camerahardware/TIS.py" beforeDir="false" afterPath="$PROJECT_DIR$/camerahardware/TIS.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_calibrate_velo_cam.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_velo_stepper.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_velo_stepper_ctrl.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ros2_ws/install/turtlesim/lib/turtlesim/draw_square" beforeDir="false" afterPath="$PROJECT_DIR$/ros2_ws/install/turtlesim/lib/turtlesim/draw_square" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ros2_ws/install/turtlesim/lib/turtlesim/mimic" beforeDir="false" afterPath="$PROJECT_DIR$/ros2_ws/install/turtlesim/lib/turtlesim/mimic" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ros2_ws/install/turtlesim/lib/turtlesim/turtle_teleop_key" beforeDir="false" afterPath="$PROJECT_DIR$/ros2_ws/install/turtlesim/lib/turtlesim/turtle_teleop_key" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ros2_ws/install/turtlesim/lib/turtlesim/turtlesim_node" beforeDir="false" afterPath="$PROJECT_DIR$/ros2_ws/install/turtlesim/lib/turtlesim/turtlesim_node" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ros2_ws/install/velodyne_driver/lib/velodyne_driver/velodyne_driver_node" beforeDir="false" afterPath="$PROJECT_DIR$/ros2_ws/install/velodyne_driver/lib/velodyne_driver/velodyne_driver_node" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ros2_ws/install/velodyne_laserscan/lib/velodyne_laserscan/velodyne_laserscan_node" beforeDir="false" afterPath="$PROJECT_DIR$/ros2_ws/install/velodyne_laserscan/lib/velodyne_laserscan/velodyne_laserscan_node" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ros2_ws/install/velodyne_pointcloud/lib/velodyne_pointcloud/velodyne_convert_node" beforeDir="false" afterPath="$PROJECT_DIR$/ros2_ws/install/velodyne_pointcloud/lib/velodyne_pointcloud/velodyne_convert_node" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ros2_ws/install/velodyne_pointcloud/lib/velodyne_pointcloud/velodyne_transform_node" beforeDir="false" afterPath="$PROJECT_DIR$/ros2_ws/install/velodyne_pointcloud/lib/velodyne_pointcloud/velodyne_transform_node" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/velohardware/main_calibrate_velo_cam.py" beforeDir="false" afterPath="$PROJECT_DIR$/velohardware/main_calibrate_velo_cam.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,6 +47,34 @@
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/camerahardware" />
     </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="main_calibrate_velo_cam" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="TIDAR" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/velohardware" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/velohardware/main_calibrate_velo_cam.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.main_calibrate_velo_cam" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">

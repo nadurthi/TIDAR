@@ -119,7 +119,7 @@ if __name__=="__main__":
         lastkey = 0
     #    cv2.namedWindow('Window', cv2.WINDOW_NORMAL)  # Create an OpenCV output window
 
-        mTis = TIS.MultiTis(str(pathfile/pathlib.Path("cameras.json")))
+        mTis = TIS.MultiTis("calibfiles/cameras.json")
         mTis.start_cameras()
 
         while 1:

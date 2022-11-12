@@ -5,9 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="83b9cf58-4e61-445f-8783-5c8b8a4ff83d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/camerahardware/velodynecalib.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/velohardware/main_cam_velo_stepper_data_collector.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/velohardware/velodynecalib.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/camerahardware/TIScamsaver_calibrator.py" beforeDir="false" afterPath="$PROJECT_DIR$/camerahardware/TIScamsaver_calibrator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/camerahardware/velodynecalib.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/velohardware/main_calibrate_velo_cam.py" beforeDir="false" afterPath="$PROJECT_DIR$/velohardware/main_calibrate_velo_cam.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -45,6 +47,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/velohardware" />
       <recent name="$PROJECT_DIR$/camerahardware" />
     </key>
   </component>

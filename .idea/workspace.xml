@@ -4,14 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83b9cf58-4e61-445f-8783-5c8b8a4ff83d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/velohardware/main_cam_velo_stepper_data_collector.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/velohardware/velodynecalib.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/camerahardware/TIScamsaver_calibrator.py" beforeDir="false" afterPath="$PROJECT_DIR$/camerahardware/TIScamsaver_calibrator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/camerahardware/velodynecalib.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/velohardware/main_calibrate_velo_cam.py" beforeDir="false" afterPath="$PROJECT_DIR$/velohardware/main_calibrate_velo_cam.py" afterDir="false" />
-    </list>
+    <list default="true" id="83b9cf58-4e61-445f-8783-5c8b8a4ff83d" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -36,15 +29,15 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "last_opened_file_path": "/home/na0043/Insync/n.adurthi@gmail.com/Google Drive/repos/TIDAR",
-    "settings.editor.selected.configurable": "preferences.keymap"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/na0043/Insync/n.adurthi@gmail.com/Google Drive/repos/TIDAR&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/velohardware" />

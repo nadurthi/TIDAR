@@ -18,9 +18,13 @@ camera_calibration_data/
 doc
 TAGS
 
+
+
 !calibfiles/*.json
 !calibfiles/*.pkl
 !calibfiles/*.ino
+
+
 
 # C extensions
 *.so

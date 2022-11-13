@@ -4,6 +4,12 @@ Created on Tue Nov  1 18:16:10 2022
 
 @author: nadur
 """
+import os
+import sys
+p1=os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+sys.path.append(p1)
+sys.path.append(os.path.join(p1,'camerahardware'))
+
 import serial
 import time
 import rclpy
@@ -20,9 +26,10 @@ from sensor_msgs.msg import LaserScan, PointCloud2
 import numpy as np
 import sys
 from camerahardware import TIS,calib_codes
+
 import cv2
 import pickle as pkl
-from . import velodynecalib
+import velodynecalib
 
 
 mTis = None
@@ -86,7 +93,7 @@ class VeloSubscriber(Node):
 
 
 class ArduinoCtrl:
-    def __init__(self, port='/dev/ttyACM0'):
+    def __init__(self, port='/dev/ttyACM1'):
         self.serialcom = serial.Serial(port=port, baudrate=9600, timeout=None)
         time.sleep(5)
         self.serialcom.reset_input_buffer()
@@ -158,6 +165,9 @@ def recordImagesCalib(folder,tag='cam_calib'):
                 cv2.imwrite(os.path.join(folder, "cam_%s_%02d.png" %(tag,jj)), images[jj])
             print("saved: ", datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
 
+    cv2.destroyAllWindows()
+
+
 if __name__ == "__main__":
     saveset = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     folder = os.path.join("simulations", "cam_velo_stepper", saveset)
@@ -222,6 +232,8 @@ if __name__ == "__main__":
         rclpy.shutdown()
         value = ardstepper.write_read('<0>')
         ardstepper.close()
+        if mTis is not None:
+            mTis.stop_cameras()
 
 
 
@@ -268,11 +280,13 @@ if __name__ == "__main__":
             pcd = source_pcd
         else:
             pcd = pcd + source_pcd
-        pcd = pcd.voxel_down_sample(voxel_size=0.005)
-
+        if step%500==0:
+            pcd = pcd.voxel_down_sample(voxel_size=0.01)
+    pcd = pcd.voxel_down_sample(voxel_size=0.01)
     o3d.visualization.draw_geometries([pcd])
-    pcd.estimate_normals(
-        search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.5, max_nn=30))
-    pcd.orient_normals_consistent_tangent_plane(100)
+    # pcd.estimate_normals(
+    #     search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.15, max_nn=30))
+    # pcd.orient_normals_consistent_tangent_plane(100)
 
     o3d.io.write_point_cloud(os.path.join(folder, 'cummulative_pcd.pcd'), pcd)
+    print("saved to folder: ",folder)

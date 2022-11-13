@@ -70,9 +70,9 @@ void loop() {
       
       while(i<steps){
         digitalWrite(pulsePin, HIGH);
-        delay(1);
+        delay(3);
         digitalWrite(pulsePin, LOW);
-        delay(1);
+        delay(5);
         ++i;
         
       }

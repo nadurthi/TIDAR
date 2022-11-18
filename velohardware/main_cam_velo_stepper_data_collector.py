@@ -9,7 +9,8 @@ import sys
 p1=os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(p1)
 sys.path.append(os.path.join(p1,'camerahardware'))
-
+from smbus import SMBus
+import time
 import serial
 import time
 import rclpy
@@ -37,6 +38,7 @@ try:
     mTis = TIS.MultiTis("calibfiles/cameras.json", onlycams=[0,2])
     mTis.start_cameras()
 except:
+    mTis = None
     print("No mTis")
 
 
@@ -93,7 +95,7 @@ class VeloSubscriber(Node):
 
 
 class ArduinoCtrl:
-    def __init__(self, port='/dev/ttyACM1'):
+    def __init__(self, port='/dev/ttyACM0'):
         self.serialcom = serial.Serial(port=port, baudrate=9600, timeout=None)
         time.sleep(5)
         self.serialcom.reset_input_buffer()
@@ -115,6 +117,88 @@ class ArduinoCtrl:
 
     def close(self):
         self.serialcom.close()
+
+class ArduinoI2cStepper:
+    def __init__(self,bus=7,i2caddress = 0x33 ):
+        self.i2cbus = SMBus(bus)
+        self.i2caddress = i2caddress
+
+    def StringToBytes(self,val):
+        retVal = []
+        for c in val:
+            retVal.append(ord(c))
+        return retVal
+    def BytesToString(selfs,rec):
+        ss=[chr(rec[i]) for i in range(len(rec)) if rec[i]<150]
+        return "".join(ss)
+
+    def ping(self):
+        self.i2cbus.write_block_data(self.i2caddress, 0x01, self.StringToBytes('<p>'))
+        time.sleep(0.01)
+        while(1):
+            rec = self.i2cbus.read_i2c_block_data(self.i2caddress, 0x01, 10)
+            ss=self.BytesToString(rec)
+            if '<p>' in ss:
+                break
+            time.sleep(0.05)
+        return ss
+
+    def flip(self):
+        self.i2cbus.write_block_data(self.i2caddress, 0x01, self.StringToBytes('<f>'))
+        time.sleep(0.01)
+        while (1):
+            rec = self.i2cbus.read_i2c_block_data(self.i2caddress, 0x01, 10)
+            ss = self.BytesToString(rec)
+            if '<cw>' in ss or '<ccw>' in ss:
+                break
+            time.sleep(0.05)
+        return ss
+
+
+    def set(self):
+        self.i2cbus.write_block_data(self.i2caddress, 0x01, self.StringToBytes('<s>'))
+        time.sleep(0.01)
+        while (1):
+            rec = self.i2cbus.read_i2c_block_data(self.i2caddress, 0x01, 10)
+            ss = self.BytesToString(rec)
+            if '<s>' in ss:
+                break
+            time.sleep(0.05)
+        return ss
+
+    def getcurrSteploc(self):
+        self.i2cbus.write_block_data(self.i2caddress, 0x01, self.StringToBytes('<g>'))
+        while (1):
+            rec = self.i2cbus.read_i2c_block_data(self.i2caddress, 0x01, 10)
+            ss = self.BytesToString(rec)
+            if 'None' not in ss:
+                break
+            time.sleep(0.05)
+        return ss
+
+    def encoderval(self):
+        self.i2cbus.write_block_data(self.i2caddress, 0x01, self.StringToBytes('<e>'))
+        while (1):
+            rec = self.i2cbus.read_i2c_block_data(self.i2caddress, 0x01, 10)
+            ss = self.BytesToString(rec)
+            if 'None' not in ss:
+                break
+            time.sleep(0.05)
+        return ss
+
+    def step(self,stp):
+        self.i2cbus.write_block_data(self.i2caddress, 0x01, self.StringToBytes('<%d>'%stp))
+        while (1):
+            rec = self.i2cbus.read_i2c_block_data(self.i2caddress, 0x01, 10)
+            ss = self.BytesToString(rec)
+            if '<ok>' in ss:
+                break
+            time.sleep(0.1)
+        return ss
+
+    def close(self):
+        self.i2cbus.close()
+
 
 def recordImagesCalib(folder,tag='cam_calib'):
     cv2windows = []
@@ -180,7 +264,7 @@ if __name__ == "__main__":
     step = 0
     try:
         # rclpy.spin(velo_subscriber)
-        ardstepper = ArduinoCtrl()
+        ardstepper = ArduinoI2cStepper()
         rclpy.init(args=None)
 
         if mTis is not None:
@@ -197,8 +281,8 @@ if __name__ == "__main__":
             time.sleep(0.01)
             rclpy.spin_once(velo_subscriber, timeout_sec=0.01)
             print("spinned first")
-            value = ardstepper.write_read('<%d>' % step)
-            print(ardstepper.write_read('<g>'))
+            value = ardstepper.step(step)
+            print(value)
             velo_subscriber.q = []
             velo_subscriber.N = 4
             while (1):
@@ -215,7 +299,7 @@ if __name__ == "__main__":
             if step > 9000 - dang:
                 step = 0
                 print("done with one rev - homing and shutdown node")
-                value = ardstepper.write_read('<0>')
+                value = ardstepper.step(0)
                 break
 
     except KeyboardInterrupt:
@@ -230,12 +314,12 @@ if __name__ == "__main__":
         doneflg.set()
         velo_subscriber.destroy_node()
         rclpy.shutdown()
-        value = ardstepper.write_read('<0>')
-        ardstepper.close()
+
         if mTis is not None:
             mTis.stop_cameras()
 
-
+    value = ardstepper.step(0)
+    ardstepper.close()
 
     with open(os.path.join('calibfiles', 'velo_step_calib.pkl'), 'rb') as F:
         [Hest, Hest_opt] = pkl.load(F)
@@ -247,7 +331,7 @@ if __name__ == "__main__":
     mn = 1
     mx = 150
 
-    for step in range(0, 9000, dang):
+    for step in range(0, 9000, 5*dang):
         i = 0
         print(step)
         fname = os.path.join(os.path.join(folder, 'velo_%05d_%02d.bin' % (step, i)))

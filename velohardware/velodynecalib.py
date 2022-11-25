@@ -62,12 +62,12 @@ def pcd2points(pcd,inliners=None,outliers=None):
 
 def dbscan_cluster(pcd):
     pcd_out=copy.deepcopy(pcd)
-    pcd_out = copy.deepcopy(pcd_out.voxel_down_sample(voxel_size=0.025))
+    pcd_out = copy.deepcopy(pcd_out.voxel_down_sample(voxel_size=0.01))
     pcd_out.estimate_normals(
-        search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.5, max_nn=30))
+        search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
     pcd_out.orient_normals_consistent_tangent_plane(100)
     XX = np.hstack([np.array(pcd_out.points), np.array(pcd_out.normals)])
-    clustering = DBSCAN(eps=0.1, min_samples=25).fit(XX)
+    clustering = DBSCAN(eps=0.2, min_samples=25).fit(XX)
     # clustering = AffinityPropagation().fit(XX)
     # clustering = AgglomerativeClustering(n_clusters=10).fit(XX)
     # clustering = KMeans(n_clusters=20, random_state=0).fit(XX)
@@ -82,6 +82,128 @@ def dbscan_cluster(pcd):
     return pcd_out,labels
 
 def extractCheckerboard_from_clusters(pcd,pcd_clustered,labels,dsquare):
+    pcd = copy.deepcopy(pcd)
+    pcd_clustered = copy.deepcopy(pcd_clustered)
+    max_label = labels.max()
+    L = np.arange(len(labels), dtype=int)
+    for i in range(max_label):
+        print(i, max_label)
+        inlier_cloud = pcd_clustered.select_by_index(L[labels == i])
+
+        bbx3d = inlier_cloud.get_axis_aligned_bounding_box()
+        bbx3d_scaled = bbx3d.scale(1.2, bbx3d.get_center())
+        insidebox_inds = bbx3d_scaled.get_point_indices_within_bounding_box(pcd.points)
+        chess_cloud = pcd.select_by_index(insidebox_inds)
+
+        plane_model, inliers2 = chess_cloud.segment_plane(distance_threshold=0.02,
+                                                          ransac_n=3,
+                                                          num_iterations=1000)
+
+        chess_cloud_inlier = chess_cloud.select_by_index(inliers2)
+        o3d.visualization.draw_geometries([chess_cloud_inlier])
+        if chess_cloud_inlier.get_oriented_bounding_box().volume() > 0.2:
+            print("volume continue")
+            continue
+        Xchess, Colchess = pcd2points(chess_cloud_inlier, inliners=None, outliers=None)
+
+        # Xchess = np.array(chess_cloud_inlier.points).copy()
+        orig = np.mean(Xchess, axis=0)
+        kdt = KDTree(Xchess)
+
+        _, x0ind = kdt.query(orig, k=1)
+        x0 = Xchess[x0ind]
+        x1ind = kdt.query_ball_point(x0, 0.25)[10]
+        x1 = Xchess[x1ind]
+
+        [a, b, c, d] = plane_model
+        nbar = [a, b, c]
+        nbar = nbar / np.linalg.norm(nbar)
+        zbar = [0, 0, 1]
+        vbar = np.cross(zbar, nbar)
+        theta = np.arccos(np.dot(nbar, zbar))
+        rotmat1 = RR.from_rotvec(-theta * vbar).as_matrix()
+        rotmat2 = RR.from_rotvec(0 * np.pi / 180 * np.array([0, 0, 1])).as_matrix()
+        Xchess_trans = Xchess - x0
+        Xchess_rot = np.matmul(rotmat2, rotmat1).dot(Xchess_trans.T).T
+
+        cx, bins = np.histogram(Colchess[:, 0], bins=300)
+        ind = np.argsort(cx)
+        thresh_int = np.mean(bins[ind][-5])
+
+        # cc=Colchess.copy()
+        # cc[cc > thresh_int] = 1
+        # cc[cc < thresh_int] = 0.1
+
+        Xwhite = Xchess_rot[Colchess[:, 0] > thresh_int, :]
+        Xblack = Xchess_rot[Colchess[:, 0] < thresh_int, :]
+
+        try:
+            blackclustering = AgglomerativeClustering(n_clusters=15, linkage='ward').fit(Xblack)
+        except:
+            print("agg cluster fail")
+            continue
+        centers = []
+        for ll in range(15):
+            centers.append(np.mean(Xblack[blackclustering.labels_ == ll, :], axis=0))
+        centers = np.array(centers)
+
+        kdt2 = KDTree(centers)
+        D, x0ind = kdt2.query(centers, k=2)
+        D = np.max(D, axis=1)
+        if np.max(D) - np.min(D) > 0.05:
+            print("max - min D")
+            continue
+        D, x0ind = kdt2.query(centers, k=5)
+        tt = 0.175 * (np.sqrt(2) + 2) / 2
+        D = D[:, 1:]
+        i1 = D < tt
+        i2 = D > tt
+        D[i1] = 1
+        D[i2] = 0
+        D = np.sum(D, axis=1)
+        leftcorners = centers[D == 1]
+        if len(leftcorners) != 2:
+            print("left corners")
+            continue
+
+        diff = leftcorners[0] - leftcorners[1]
+        theta2 = np.arctan2(diff[1], diff[0])
+
+        rotmat2 = RR.from_rotvec(-(theta2 + np.pi / 2) * np.array([0, 0, 1])).as_matrix()
+        leftcorners_aligned = rotmat2.dot(leftcorners.T).T
+        if np.all(leftcorners_aligned[:, 0] > 0):
+            rotmat2 = RR.from_rotvec(-(theta2 - np.pi / 2) * np.array([0, 0, 1])).as_matrix()
+            leftcorners_aligned = rotmat2.dot(leftcorners.T).T
+
+        centers_aligned = rotmat2.dot(centers.T).T
+        # plt.plot(centers_aligned[:,0],centers_aligned[:,1],'r*')
+        if leftcorners_aligned[0, 1] < leftcorners_aligned[1, 1]:
+            bottom_left_center = leftcorners_aligned[0]
+        else:
+            bottom_left_center = leftcorners_aligned[1]
+        bottom_left = bottom_left_center + [dsquare / 2, dsquare / 2, 0]
+        objp_checker = np.zeros((5 * 4, 3), np.float32)
+        objp_checker[:, :2] = np.mgrid[0:5, 0:4].T.reshape(-1, 2, order='F')
+        objp_checker = objp_checker * dsquare
+        objp_checker += bottom_left
+
+        # now reversing the points
+        objp_checker = np.linalg.inv(np.matmul(rotmat2, rotmat1)).dot(objp_checker.T).T
+        objp_checker = objp_checker + x0
+
+        colobj = np.zeros((objp_checker.shape[0], 3))
+        colobj[:, 0] = 1
+        colobj[0] = [0, 1, 0]
+        colobj[1] = [0, 0, 1]
+        colobj[4] = [1, 1, 0]
+        pcdobjp_checker = points2pcd(objp_checker, index=None, colmat=colobj, colvec=None)
+        plotpcds([pcdobjp_checker, pcd])
+
+        break
+
+    return objp_checker
+
+def manual_extractCheckerboard_from_clusters(pcd,pcd_clustered,labels,dsquare):
     pcd = copy.deepcopy(pcd)
     pcd_clustered=copy.deepcopy(pcd_clustered)
 
@@ -101,6 +223,7 @@ def extractCheckerboard_from_clusters(pcd,pcd_clustered,labels,dsquare):
                                                           num_iterations=1000)
 
         chess_cloud_inlier = chess_cloud.select_by_index(inliers2)
+        o3d.visualization.draw_geometries([chess_cloud_inlier])
         if chess_cloud_inlier.get_oriented_bounding_box().volume() > 0.2:
             continue
         Xchess,Colchess = pcd2points(chess_cloud_inlier, inliners=None, outliers=None)
@@ -237,16 +360,8 @@ def fitplane():
 
 
 
-def project3Dpoints_on_imageplane():
-    h=480
-    w=640
-    foc=600
-    K=np.array([[foc,0,w//2],[0,foc,h//2],[0,0,1]])
-    indf=(Xv[:,0]<0) & (Xv[:,2]<0)
-    Xvfil = Xv[indf,:]
-    Xvcolfil = Xvcol[indf,:]
-    Hcamrot=Hmat([0,135,0],[0,0,0])
-    Xc = Hcamrot[0:3,0:3].dot(Xvfil.T).T
+def project3Dpoints_on_imageplane(Xc,h,w):
+
 
     Xcfrust=K.dot(Xc.T).T
     Xcfrust=Xcfrust/Xcfrust[:,2].reshape(-1,1)
@@ -299,3 +414,83 @@ def project3Dpoints_on_imageplane():
     o3d.visualization.draw_geometries([pcd2,mesh_frame])
 
 
+
+##=----------------------------
+
+def demo_crop_geometry():
+    print("Demo for manual geometry cropping")
+    print(
+        "1) Press 'Y' twice to align geometry with negative direction of y-axis"
+    )
+    print("2) Press 'K' to lock screen and to switch to selection mode")
+    print("3) Drag for rectangle selection,")
+    print("   or use ctrl + left click for polygon selection")
+    print("4) Press 'C' to get a selected geometry")
+    print("5) Press 'S' to save the selected geometry")
+    print("6) Press 'F' to switch to freeview mode")
+    pcd_data = o3d.data.DemoICPPointClouds()
+    pcd = o3d.io.read_point_cloud(pcd_data.paths[0])
+    o3d.visualization.draw_geometries_with_editing([pcd])
+
+
+def draw_registration_result(source, target, transformation):
+    source_temp = copy.deepcopy(source)
+    target_temp = copy.deepcopy(target)
+    source_temp.paint_uniform_color([1, 0.706, 0])
+    target_temp.paint_uniform_color([0, 0.651, 0.929])
+    source_temp.transform(transformation)
+    o3d.visualization.draw_geometries([source_temp, target_temp])
+
+
+def pick_points(pcd):
+    print("")
+    print(
+        "1) Please pick at least three correspondences using [shift + left click]"
+    )
+    print("   Press [shift + right click] to undo point picking")
+    print("2) After picking points, press 'Q' to close the window")
+    vis = o3d.visualization.VisualizerWithEditing()
+    vis.create_window()
+    vis.add_geometry(pcd)
+    vis.run()  # user picks points
+    vis.destroy_window()
+    print("")
+    return vis.get_picked_points()
+
+
+def demo_manual_registration():
+    print("Demo for manual ICP")
+    pcd_data = o3d.data.DemoICPPointClouds()
+    source = o3d.io.read_point_cloud(pcd_data.paths[0])
+    target = o3d.io.read_point_cloud(pcd_data.paths[2])
+    print("Visualization of two point clouds before manual alignment")
+    draw_registration_result(source, target, np.identity(4))
+
+    # pick points from two point clouds and builds correspondences
+    picked_id_source = pick_points(source)
+    picked_id_target = pick_points(target)
+    assert (len(picked_id_source) >= 3 and len(picked_id_target) >= 3)
+    assert (len(picked_id_source) == len(picked_id_target))
+    corr = np.zeros((len(picked_id_source), 2))
+    corr[:, 0] = picked_id_source
+    corr[:, 1] = picked_id_target
+
+    # estimate rough transformation using correspondences
+    print("Compute a rough transform using the correspondences given by user")
+    p2p = o3d.pipelines.registration.TransformationEstimationPointToPoint()
+    trans_init = p2p.compute_transformation(source, target,
+                                            o3d.utility.Vector2iVector(corr))
+
+    # point-to-point ICP for refinement
+    print("Perform point-to-point ICP refinement")
+    threshold = 0.03  # 3cm distance threshold
+    reg_p2p = o3d.pipelines.registration.registration_icp(
+        source, target, threshold, trans_init,
+        o3d.pipelines.registration.TransformationEstimationPointToPoint())
+    draw_registration_result(source, target, reg_p2p.transformation)
+    print("")
+
+
+# if __name__ == "__main__":
+    demo_crop_geometry()
+    demo_manual_registration()

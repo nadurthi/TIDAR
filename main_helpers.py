@@ -157,6 +157,14 @@ def getUncalibRect(Limg, Rimg):
 
     return Ldst, Rdst
 
+def get_colored_depth_fromdepth(Ldst,depth,dmax=100):
+    points = cv2.reprojectImageTo3D(disp.astype(np.int16), Q)
+    depths = np.linalg.norm(points, axis=2)
+    depths[depths > dmax] = np.inf
+    scaled_depths = (depths * 10).round().astype(np.uint8)
+    rangeToUse = [0, 255]  # from 20-30° celsius
+    normed_range = normalizeImg(rangeToUse[0], rangeToUse[1], scaled_depths)
+    depthcolor = cv2.applyColorMap(normed_range, 5)
 
 def get_colored_depth(Ldst,disp,Q,dmax=100,returnpcd=False):
     points = cv2.reprojectImageTo3D(disp.astype(np.int16), Q)

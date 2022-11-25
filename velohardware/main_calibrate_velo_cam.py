@@ -15,7 +15,8 @@ from camerahardware import calib_codes
 from velohardware import velodynecalib
 from scipy.spatial import KDTree
 
-
+import importlib
+importlib.reload(velodynecalib)
 # with open(os.path.join('calibfiles', 'velo_step_calib.pkl'), 'rb') as F:
 #     [Hest, Hest_opt] = pkl.load(F)
 #
@@ -30,22 +31,28 @@ from scipy.spatial import KDTree
 # Hrv : velodyne to rotation frame
 
 
-folder='/media/na0043/misc/DATA/cam_velo_stepper/2022-11-07-16-38-06'
+# folder='/media/na0043/misc/DATA/cam_velo_stepper/1m/2022-11-18_outside/2022-11-18-16-25-42'
+folder='/media/na0043/misc/DATA/cam_velo_stepper/1m/2022-11-15_outside/2022-11-15-14-34-13_calib'
 pcdfile = os.path.join(folder,'cummulative_pcd.pcd')
 dsquare=0.175
 
 
 pcd = o3d.io.read_point_cloud(pcdfile)
-Xv,Colv = velodynecalib.pcd2points(pcd)
+o3d.visualization.draw_geometries_with_editing([pcd])
 
-indf=(Xv[:,0]<0) & (Xv[:,2]<0)
-pcdf=velodynecalib.points2pcd(Xv,index=indf,colmat=Colv)
+pcd_crop = o3d.io.read_point_cloud(os.path.join(folder,'cropped_1.ply'))
+o3d.visualization.draw_geometries([pcd_crop])
+
+Xv,Colv = velodynecalib.pcd2points(pcd_crop)
+
+# indf=(Xv[:,0]<0) & (Xv[:,2]<0)
+# pcdf=velodynecalib.points2pcd(Xv,index=indf,colmat=Colv)
 
 
-pcd_clustered,labels_clustered = velodynecalib.dbscan_cluster(pcd)
+pcd_clustered,labels_clustered = velodynecalib.dbscan_cluster(pcd_crop)
 velodynecalib.plotpcds([pcd_clustered])
 
-objp_checker=velodynecalib.extractCheckerboard_from_clusters(pcd,pcd_clustered,labels_clustered,dsquare)
+objp_checker=velodynecalib.extractCheckerboard_from_clusters(pcd_crop,pcd_clustered,labels_clustered,dsquare)
 
 # now get image points----------------------------
 cimg=cv2.imread(os.path.join(folder, 'cam_00.png'))

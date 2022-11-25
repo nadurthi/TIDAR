@@ -1,9 +1,10 @@
+import copy
 import os
 import sys
 import sys
-p1=os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-sys.path.append(p1)
-sys.path.append(os.path.join(p1,'camerahardware'))
+# p1=os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+# sys.path.append(p1)
+# sys.path.append(os.path.join(p1,'camerahardware'))
 import time
 
 
@@ -20,7 +21,7 @@ from camerahardware import TIS,calib_codes
 
 import cv2
 import pickle as pkl
-import velodynecalib
+from velohardware import velodynecalib
 
 with open(os.path.join('calibfiles', 'velo_step_calib.pkl'), 'rb') as F:
     [Hest, Hest_opt] = pkl.load(F)
@@ -29,9 +30,11 @@ with open(os.path.join('calibfiles', 'velo_step_calib.pkl'), 'rb') as F:
 X = []
 p1 = 0
 pcd = None
+PCD=[]
 mn = 1
 mx = 150
-folder='simulations/cam_velo_stepper/2022-11-15-14-48-19'
+# folder='/media/na0043/misc/DATA/cam_velo_stepper/1m/2022-11-15_outside/2022-11-15-14-13-44'
+folder='/media/na0043/misc/DATA/cam_velo_stepper/1m/2022-11-15_outside/2022-11-15-14-34-13_calib'
 for step in range(0, 9000, 10):
     i = 0
     print(step)
@@ -67,11 +70,54 @@ for step in range(0, 9000, 10):
         pcd = pcd + source_pcd
     if step % 500 == 0:
         pcd = pcd.voxel_down_sample(voxel_size=0.01)
+
+    if step==5000:
+        pcd = pcd.voxel_down_sample(voxel_size=0.01)
+        PCD.append(pcd)
+        pcd=None
+
 pcd = pcd.voxel_down_sample(voxel_size=0.01)
-o3d.visualization.draw_geometries([pcd])
+PCD.append(pcd)
+
+o3d.visualization.draw_geometries([PCD[0]])
+o3d.visualization.draw_geometries([PCD[1]])
+o3d.visualization.draw_geometries(PCD)
+PCD_copy = copy.deepcopy(PCD)
+
+PCD_copy[0] = PCD_copy[0].voxel_down_sample(voxel_size=0.05)
+PCD_copy[1] = PCD_copy[1].voxel_down_sample(voxel_size=0.05)
+PCD_copy[0].estimate_normals(
+    search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.5, max_nn=30))
+PCD_copy[0].orient_normals_consistent_tangent_plane(15)
+PCD_copy[1].estimate_normals(
+    search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.5, max_nn=30))
+PCD_copy[1].orient_normals_consistent_tangent_plane(15)
+print("ok")
+
+crti=o3d.pipelines.registration.ICPConvergenceCriteria(relative_fitness=0.000001,
+                                           relative_rmse=0.000001,
+                                           max_iteration=50000)
+reg_p2l = o3d.pipelines.registration.registration_icp(
+    PCD_copy[1], PCD_copy[0], 1, np.identity(4),
+    o3d.pipelines.registration.TransformationEstimationPointToPlane(),crti)
+print("ok2")
+
+icp_fine = o3d.pipelines.registration.registration_generalized_icp(
+        PCD_copy[1], PCD_copy[0], 1,
+        reg_p2l.transformation,
+        o3d.pipelines.registration.
+        TransformationEstimationForGeneralizedICP(),
+        o3d.pipelines.registration.ICPConvergenceCriteria(
+            relative_fitness=1e-6,
+            relative_rmse=1e-6,
+            max_iteration=30))
+print("ok3")
+
+o3d.visualization.draw_geometries([copy.deepcopy(PCD[1]).transform(icp_fine.transformation),PCD[0] ])
 # pcd.estimate_normals(
 #     search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.15, max_nn=30))
 # pcd.orient_normals_consistent_tangent_plane(100)
 
+pcd = copy.deepcopy(PCD[1]).transform(reg_p2l.transformation)+PCD[0]
 o3d.io.write_point_cloud(os.path.join(folder, 'cummulative_pcd.pcd'), pcd)
 print("saved to folder: ", folder)

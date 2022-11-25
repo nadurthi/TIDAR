@@ -24,10 +24,10 @@ def Hmat(eulangles,t):
 
 Hest=np.linalg.multi_dot([Hmat([0,0,0],[0,0.01,0]),Hmat([0,0,-85],[0,0,0]),Hmat([0,0,0],[0,-0.055,0]),Hmat([0,0,0],[0,0,0.04])])
 
-folder='simulations/cam_velo_stepper/2022-11-07-16-38-06'
+folder='/media/na0043/misc/DATA/cam_velo_stepper/1m/2022-11-15_outside/2022-11-15-14-34-13_calib'
 X=[]
-for step in range(0,8000,100):
-    i=3
+for step in range(0,8000,20):
+    i=0
     fname=os.path.join(os.path.join(folder,'velo_%05d_%02d.bin'%(step,i)))
     x=np.fromfile(fname, dtype=np.float32).reshape(4,-1,order='F').T
     R=np.array([[0,-1,0],[1,0,0],[0,0,1]])
@@ -75,7 +75,8 @@ for p1,p2 in pairs:
     # o3d.visualization.draw_geometries([target_pcd],point_show_normal=True)
     
     threshold=0.1
-    ang= (p2-p1)*2.25
+    # ang= (p2-p1)*2.25
+    ang = (20 * p2 - 20 * p1) * 0.9 / 40
     Hr = Hmat([-ang,0,0],[0,0,0])
     Hrv=Hest
     Hvr=np.linalg.inv(Hrv)
@@ -130,7 +131,7 @@ target_pcd.estimate_normals(
     search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.5, max_nn=30))
 target_pcd.orient_normals_consistent_tangent_plane(15)
 
-ang= (p2-p1)*2.25
+ang = (20 * p2 - 20 * p1) * 0.9 / 40
 Hr = Hmat([-ang,0,0],[0,0,0])
 Hrv=Hest_opt
 Hvr=np.linalg.inv(Hrv)
